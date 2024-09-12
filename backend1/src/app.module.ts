@@ -18,6 +18,8 @@ import { TicketDetail } from './ticket-details/entities/ticket-detail.entity';
 import { BusSeats } from './bus-details/entities/bus-seats.entity';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule } from '@nestjs/config';
+import { EmailerModule } from './emailer/emailer.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -49,6 +51,7 @@ import { ConfigModule } from '@nestjs/config';
     BusRoutesModule,
     ConductorDetailsModule,
     TicketDetailsModule,
+    EmailerModule,
   ],
 })
 export class AppModule {}
