@@ -6,10 +6,13 @@ export const actions = {
   async triggerSetAuth({ commit }, payload) {
     const result = await userService.loginUser(payload);
     if (result.status == 200) {
-      localStorage.setItem("token", result.data.token);
-      localStorage.setItem("role", result.data.role);
-      commit("SET_AUTH", result.data);
+      if(result.data!=false){
+        localStorage.setItem("token", result.data.token);
+        localStorage.setItem("role", result.data.role);
+        commit("SET_AUTH", result.data);
+      }
     }
+    return result;
   },
 
   async triggerResetAuth({ commit }) {
@@ -112,5 +115,32 @@ async triggerUpdatePassengersTraveledStatus({commit},payload){
   console.log(commit);
   const result = await ticketDetailServices.updatePassengersTraveledStatus(payload);
   return result;
+},
+
+async triggerSendEmail({commit},payload){
+  console.log(commit);
+  const result = await userService.sendEmail(payload);
+  return result;
+},
+
+async triggerGetOtpForForgetPassRequest({commit},payload){
+  console.log(commit);
+   return await userService.getOtpForForgetPassRequest(payload);
+},
+
+async triggerCheckForgetPassOtp({commit},payload){
+  console.log(commit);
+  console.log(payload);
+  return await userService.checkForgetPassOtp(payload);
+},
+
+async triggerGenerateOptToCancelTicket({commit},payload){
+  console.log(commit);
+  return await ticketDetailServices.generateOtpToCancelTicket(payload);
+},
+
+async triggerCancelBookedTicket({commit},payload){
+  console.log(commit);
+ return await ticketDetailServices.cancelBookedTicket(payload);
 }
 };

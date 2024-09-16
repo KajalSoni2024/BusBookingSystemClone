@@ -26,17 +26,20 @@ export class BusDetailsController {
     private readonly passengerService: PassengerService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post('/addBusDetails')
   create(@Body() createBusDetailDto: any) {
     return this.busDetailsService.create(createBusDetailDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getBusByRoute')
   async getBuses(@Request() req, @Response() res, @Query() query) {
     const result = await this.busDetailsService.getBusesByRoute(query);
     res.status(HttpStatus.OK).json(result);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getAvailableSeats')
   async getAvailSeats(
     @Request() req,
@@ -47,47 +50,62 @@ export class BusDetailsController {
     res.status(HttpStatus.OK).json(result);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getBusSeatsById')
   findBusSeatsByBusId(@Query('busId') busId: number) {
     return this.busDetailsService.getBusSeatsByBusId(busId);
   }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/getbusesWithoutConductors')
   findBusesWithoutConductors() {
     return this.busDetailsService.getBusesWithoutConductors();
   }
+
+  @UseGuards(JwtAuthGuard)
   @Get('/getAllBuses')
-  async getAllBuses() {
+  async getAllBuses(@Request() req: any) {
+    console.log(req);
     return await this.busDetailsService.getAllBuses();
   }
+
+  @UseGuards(JwtAuthGuard)
   @Get('getBusDetailsById')
   async getBusDetailsById(@Query('busId') busId: number) {
     return await this.busDetailsService.getBusDetailsById(busId);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/updateBusDetails')
   async updateBusDetails(@Body() busDetails: any) {
     return await this.busDetailsService.updateBusDetails(busDetails);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/updateBusConductorDetails')
   async updateBusConductorDetails(@Body() payload: any) {
     return await this.busDetailsService.updateBusConductorDetails(payload);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/updateBusRouteDetails')
   async updateBusRouteDetails(@Body() payload: any) {
     return await this.busDetailsService.updateBusRouteDetails(payload);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('/addConductorDetails')
   async addConductorDetail(@Body() payload: any) {
     return this.busDetailsService.addConductorDetails(payload);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getAssignedBuses')
-  async getAssignedBuses() {
-    const userId = 3;
-    const result = await this.busDetailsService.getAssignedBusesById(userId);
+  async getAssignedBuses(@Request() req: any) {
+    const user = req.user;
+    const result = await this.busDetailsService.getAssignedBusesById(
+      user.userId,
+    );
     return result;
   }
 }

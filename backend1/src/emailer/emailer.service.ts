@@ -11,14 +11,14 @@ export class EmailerService {
       secure: false, // true for 465, false for other ports
       auth: {
         user: 'ks8995943@gmail.com', // Replace with your email
-        pass: 'your-email-password', // Replace with your email password
+        pass: 'puebpjqkwilsxriv', // Replace with your email password
       },
     });
   }
 
-  async sendMail(to: string, subject: string, text: string) {
+  async sendMail(to: string, subject: string, text: any) {
     const info = await this.transporter.sendMail({
-      from: '"Your App Name" <your-email@example.com>',
+      from: '"Bus Booking System" ks8995943@gmail.com',
       to,
       subject,
       text,

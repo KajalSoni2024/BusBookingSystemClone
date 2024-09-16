@@ -13,6 +13,7 @@ import { BusDetail } from '../../bus-details/entities/bus-detail.entity';
 import { Passengers } from '../../passenger/entities/passenger.entity';
 import { TicketPayment } from '../../payments/entities/payment.entity';
 import { User } from 'src/users/entities/users.entity';
+import { CancelTicketRequest } from './cancel-ticket-req.entity';
 @Entity()
 export class TicketDetail {
   @PrimaryGeneratedColumn()
@@ -29,6 +30,12 @@ export class TicketDetail {
 
   @Column()
   destination: string;
+
+  @OneToMany(
+    () => CancelTicketRequest,
+    (cancelTicketReq) => cancelTicketReq.ticket,
+  )
+  cancelTicketRequest: CancelTicketRequest[];
 
   @ManyToOne(() => User, (user) => user.tickets)
   @JoinColumn({ name: 'userId' })

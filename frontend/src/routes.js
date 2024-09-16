@@ -102,6 +102,11 @@ const routes = [
     component:()=>import("./components/BusesAssignedToConductor.vue"),
     path:"/assignedBuses"
   },
+  {
+    name:"SendEmail",
+    component:()=>import("./components/sendEmail.vue"),
+    path:"/sendEmail"
+  }
 
 ];
 

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TicketPayment } from './entities/payment.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/users.entity';
 
 const stripe = require('stripe')(
   'sk_test_51PbaP8JlehMaIxjH8ih7mWf2DpABoFMv28R76jwGxh1XL8fxJeQtbDg56N2A7ycBzO7Egic5shOYNPYbfN5epBZS00AqT1ttlU',
@@ -13,8 +14,8 @@ export class PaymentsService {
     private paymentRepo: Repository<TicketPayment>,
   ) {}
 
-  async makePayment(paymentData: any) {
-    const userId: any = 1;
+  async makePayment(paymentData: any, user: User) {
+    const userId: any = user.userId;
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [

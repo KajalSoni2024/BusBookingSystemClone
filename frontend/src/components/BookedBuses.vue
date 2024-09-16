@@ -9,7 +9,7 @@
         <div class="d-flex flex-row ga-2 mt-2">
             <v-btn color="deep-orange-darken-2" variant="outlined" @click="viewTicket(ticket.ticketDetail.ticketId)">View Ticket</v-btn>
             <v-btn color="deep-orange-darken-2
-" @click="cancelTicket(ticket)">Cancel Ticket</v-btn></div>
+" @click="showConfirmationModal(ticket)">Cancel Ticket</v-btn></div>
     </v-card>
 </div>
 </template>
@@ -44,27 +44,95 @@
 </v-card-item>
 </v-card>
 </v-dialog>
+<v-dialog v-model="isShowOtpModal" width="auto">
+    <v-card class="pa-5" width="600px">
+        <div><v-icon class="float-right" @click="isShowOtpModal=false">mdi-close</v-icon></div>
+        <v-text-field label="Enter OTP" v-model="otp" color="deep-orange-darken-2" @keyup.enter="cancelTicket" ></v-text-field>
+    </v-card>
+</v-dialog>
+<v-dialog v-model="isShowConfirmationModal" width="auto">
+<v-card width="600px" class="pa-5">
+    <div><v-icon @click="isShowConfirmationModal=false">mdi-close</v-icon></div>
+    <div class="d-flex flex-row justify-center align-center">
+    <p class="text-center">Are you sure you want to cancel ticket</p>
+    </div>
+    <div class="d-flex flex-row justify-center align-center ga-5"><v-btn variant="outlined" color="deep-orange-darken-2" @click="showAlert">Yes</v-btn>
+        <v-btn variant="outlined" color="deep-orange-darken-2" @click="isShowConfirmationModal=false">No</v-btn></div>
+
+     </v-card>
+</v-dialog>
+<v-dialog v-model="isShowAlert" width="auto">
+    <v-card width="600px" class="pa-5">
+        <div><v-icon @click="isShowAlert=false">mdi-close</v-icon></div>
+        <div class="d-flex flex-row justify-center align-center">
+            <p class="text-center">Otp will be shared on your register email , Please enter the OTP to cancel your ticket</p>
+        </div>
+        <div class="d-flex flex-row justify-center align-center"><v-btn variant="outlined" color="deep-orange-darken-2" @click="generateOtp">Ok</v-btn></div>
+    </v-card>
+</v-dialog>
+<v-dialog v-model="isShowAlertMsg" width="auto">
+    <v-card width="600px" class="pa-5">
+    <div><v-icon @click="isShowAlertMsg=false">mdi-close</v-icon></div>
+    <div class="d-flex flex-row justify-center align-center"><p :class="isDanger?'text-red':'text-success'" class="text-center">{{ alertMsg }}</p></div>
+    </v-card>
+</v-dialog>
 </template>
 <script setup>
 import { onMounted , computed, ref} from "vue";
-import { axiosPost } from "@/services/service";
 import {useStore} from "vuex";
 const store  = useStore();
 const isViewTicket = ref(false);
+const isShowOtpModal = ref(false);
+const isShowAlert = ref(false);
+const isShowAlertMsg = ref(false);
+const isShowConfirmationModal = ref(false);
+const otp = ref(null);
+const ticketToBeCanceled = ref({});
+const alertMsg = ref(null);
+const isDanger=ref(false);
 const bookedTickets = computed(()=>{
     return store.state.users.bookedTickets;
 });
-const cancelTicket = async (ticket)=>{
-    console.log("ticket",ticket);
-    const result = await axiosPost('/tickets/cancelBookedTicket',ticket);  
-    console.log(result)
-   await store.dispatch("triggerGetBookedTickets");
+const cancelTicket = async ()=>{
+    const result = await store.dispatch("triggerCancelBookedTicket",{ticket:ticketToBeCanceled.value,otp:otp.value});
+    console.log(result);
+    if(result.status==201){
+        if(result.data==true){
+            await store.dispatch("triggerGetBookedTickets");
+            isShowAlertMsg.value=true;
+            alertMsg.value="Your Ticket has been cancelled successfully"
+            isDanger.value=false;
+            isShowOtpModal.value=false;
+
+        }else{
+        isShowAlertMsg.value=true;
+            alertMsg.value="Invalid Otp"
+            isDanger.value=true;
+    }
+    }
 }
 
+const showConfirmationModal =async (ticket)=>{
+  ticketToBeCanceled.value = ticket;
+  isShowConfirmationModal.value=true;
+}
 const ticketDetails = ref([]);
 const viewTicket = async (ticketId)=>{
     ticketDetails.value = bookedTickets.value.filter((ticket)=>{return ticket.ticketDetail.ticketId==ticketId})
     isViewTicket.value=true;
+}
+
+const showAlert = ()=>{
+    isShowConfirmationModal.value=false;
+    isShowAlert.value = true;
+}
+
+const generateOtp = async  ()=>{
+    const result = await store.dispatch("triggerGenerateOptToCancelTicket",{ticketId:ticketToBeCanceled.value.ticketDetail.ticketId});
+    if(result.status==201){
+        isShowAlert.value=false;
+        isShowOtpModal.value=true;
+    }
 }
 
 const getLocalDateTime = (date)=>{

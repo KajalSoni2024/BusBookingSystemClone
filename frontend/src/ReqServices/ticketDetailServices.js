@@ -35,6 +35,12 @@ export default {
     async updatePassengersTraveledStatus(payload){
         const result = await axiosGet(`/updatePassengersTraveledStatus/?passengerId=${payload.passengerId}&hasTraveled=${payload.hasTraveled}`);
         return result;
-    }
-
+    },
+   async generateOtpToCancelTicket(payload){
+       return await axiosPost('/tickets/generateOtpToCancelTicket',payload)
+   },
+   async cancelBookedTicket(payload){
+    console.log(payload);
+     return await axiosPost('/tickets/cancelBookedTicket',payload);
+   }
 }

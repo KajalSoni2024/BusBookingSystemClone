@@ -38,6 +38,14 @@
       </p>
     </div>
   </div>
+  <v-dialog v-model="isShowAlert" width="auto">
+    <v-card width="600px" class="pa-5">
+  <div><v-icon class="float-right" @click="isShowAlert=false">mdi-close</v-icon></div>
+  <div>
+    <p class="text-center text-red">Invalid Email or Password try again</p>
+  </div>
+    </v-card>
+  </v-dialog>
 </template>
 <script setup>
 import {useVuelidate} from "@vuelidate/core";
@@ -50,6 +58,7 @@ const store = useStore();
 const router = useRouter();
 const role = computed(()=>store.state.users.role);
 const isShowPassword = ref(false);
+const isShowAlert = ref(false);
 const loginData = reactive({
   email: null,
   password: null,
@@ -74,8 +83,10 @@ const isValid = await v$.value.$validate();
 if(!isValid){
   return; 
 }
-  await store.dispatch("triggerSetAuth", loginData);
-  if(role.value===1){
+  const result = await store.dispatch("triggerSetAuth", loginData);
+  console.log(result);
+  if(result.data!=false){
+    if(role.value===1){
     router.push({name:"AddBusDetail"})
   }
   else if(role.value===2){
@@ -84,6 +95,10 @@ if(!isValid){
   else{
     router.push({ name: "HomePage" });
   }
+  }else{
+  isShowAlert.value=true;
+  }
+ 
 }
 
 const forgetPass = ()=>{

@@ -11,15 +11,19 @@ export class ConductorDetailsService {
     private busConductorRepo: Repository<ConductorDetail>,
   ) {}
   async create(createConductorDetailDto: any) {
-    const busId = createConductorDetailDto.busId;
-    const response = await this.busConductorRepo.manager.transaction(
-      async (entityManager) => {
-        return await entityManager.save(ConductorDetail, [
-          { ...createConductorDetailDto.details[0], bus: busId },
-          { ...createConductorDetailDto.details[1], bus: busId },
-        ]);
-      },
-    );
-    return response;
+    try {
+      const busId = createConductorDetailDto.busId;
+      const response = await this.busConductorRepo.manager.transaction(
+        async (entityManager) => {
+          return await entityManager.save(ConductorDetail, [
+            { ...createConductorDetailDto.details[0], bus: busId },
+            { ...createConductorDetailDto.details[1], bus: busId },
+          ]);
+        },
+      );
+      return response;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

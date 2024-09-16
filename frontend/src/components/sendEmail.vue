@@ -4,17 +4,24 @@
         <v-text-field label="Subject" v-model="emailBody.subject"></v-text-field>
         <v-text-field label="Message" v-model="emailBody.text"></v-text-field>
     </div>
+    <div class="d-flex flex-row justify-center align-center"><v-btn @click="sendEmail" variant="outlined">Send</v-btn></div>
 </template>
 <script setup>
-import {onMounted, reactive} from "vue";
+import {reactive} from "vue";
+import {useStore} from "vuex";
+const store = useStore();
 const emailBody = reactive({
     to:null,
     subject:null,
     text:null
 })
-onMounted(()=>{
 
-})
+const sendEmail =async ()=>{
+  const result =  await store.dispatch("triggerSendEmail",emailBody);
+  if(result.status=='201'){
+    console.log(result.data);
+  }
+}
 
 </script>
 <style scoped></style>

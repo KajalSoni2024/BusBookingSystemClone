@@ -7,13 +7,17 @@ import {
   Response,
   HttpStatus,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.gaurd';
-
+import { EmailerService } from 'src/emailer/emailer.service';
 @Controller('user')
 export class UserController {
-  constructor(private userService: UsersService) {}
+  constructor(
+    private userService: UsersService,
+    private emailService: EmailerService,
+  ) {}
   @Post('/register')
   async create(
     @Request() req,
@@ -59,5 +63,26 @@ export class UserController {
   @Get('/getUserById')
   async getUserById(@Query('userId') userId: number) {
     return this.userService.getUserById(userId);
+  }
+
+  @Get('/getOtpForForgetPassRequest')
+  async getOtpForForgetPassRequest(
+    @Request() req: any,
+    @Query('email') email: string,
+  ) {
+    const user = await this.userService.getUserByEmail(email);
+    const result = await this.userService.getOtpForForgetPassRequest(email);
+    if (result == false) {
+      return false;
+    }
+    const txt = 'Please Enter this otp to reset your password';
+    const emailResult = await this.emailService.sendMail(email, txt, result);
+    console.log(emailResult);
+    return { userId: user.userId };
+  }
+
+  @Get('/checkForgetPassOtp')
+  async checkForgetPassOtp(@Query() query: any) {
+    return this.userService.checkForgetPassOtp(query);
   }
 }

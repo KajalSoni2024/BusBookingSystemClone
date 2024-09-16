@@ -9,6 +9,7 @@ import { TicketPayment } from 'src/payments/entities/payment.entity';
 import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { DataSource } from 'typeorm';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
+import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
 @Injectable()
 export class TicketDetailsService {
   constructor(
@@ -22,27 +23,34 @@ export class TicketDetailsService {
     private BusSeatsRepo: Repository<BusSeats>,
     @InjectRepository(BusDetail)
     private BusDetailRepo: Repository<BusDetail>,
+    @InjectRepository(CancelTicketRequest)
+    private cancelTicketRequestRepo: Repository<CancelTicketRequest>,
   ) {}
 
   async createTicket(data: any) {
-    const resposne = await this.ticketDetailRepo.manager.transaction(
+    const response = await this.ticketDetailRepo.manager.transaction(
       async (entityManager) => {
         const result = await entityManager.save(TicketDetail, data);
         return result;
       },
     );
+    return response;
   }
 
   async getPassByTicketId(ticketId: number) {
-    const result = await this.ticketDetailRepo.findOne({
-      where: {
-        ticketId: ticketId,
-      },
-      relations: {
-        passengers: true,
-      },
-    });
-    return result;
+    try {
+      const result = await this.ticketDetailRepo.findOne({
+        where: {
+          ticketId: ticketId,
+        },
+        relations: {
+          passengers: true,
+        },
+      });
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getBookedTicketDetails(ticketId: any) {
@@ -71,109 +79,132 @@ export class TicketDetailsService {
     }
   }
 
-  async getAllBookedTicketsByUser() {
-    const userId = 1;
-    const ticketPaymentDetails = await this.PaymentsRepo.createQueryBuilder(
-      'payments',
-    )
-      .innerJoinAndSelect('payments.ticketDetail', 'ticketDetail')
-      .where('payments.user=:userId', { userId: userId })
-      .andWhere('ticketDetail.ticketDate>:currentDate', {
-        currentDate: new Date(),
-      })
-      .andWhere('payments.status=:status', { status: true })
-      .getMany();
+  async getAllBookedTicketsByUser(userId: any) {
+    try {
+      const ticketPaymentDetails = await this.PaymentsRepo.createQueryBuilder(
+        'payments',
+      )
+        .innerJoinAndSelect('payments.ticketDetail', 'ticketDetail')
+        .where('payments.user=:userId', { userId: userId })
+        .andWhere('ticketDetail.ticketDate>:currentDate', {
+          currentDate: new Date(),
+        })
+        .andWhere('payments.status=:status', { status: true })
+        .getMany();
 
-    const result = Promise.all(
-      ticketPaymentDetails.map(async (payment) => {
-        const ticketId = payment.ticketDetail.ticketId;
-        const passengerDetail = await this.ticketDetailRepo.findOne({
-          relations: {
-            passengers: true,
-            busDetail: true,
-          },
-          where: { ticketId: ticketId },
-        });
-        return { ...payment, ticketWithPassenger: passengerDetail };
-      }),
-    );
-    console.log(result);
-    return result;
+      const result = Promise.all(
+        ticketPaymentDetails.map(async (payment) => {
+          const ticketId = payment.ticketDetail.ticketId;
+          const passengerDetail = await this.ticketDetailRepo.findOne({
+            relations: {
+              passengers: true,
+              busDetail: true,
+            },
+            where: { ticketId: ticketId },
+          });
+          return { ...payment, ticketWithPassenger: passengerDetail };
+        }),
+      );
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async cancelBookedTicket(payload: any) {
-    const { paymentId, ticketDetail } = payload;
+    const { ticket, otp } = payload;
+    const { paymentId, ticketDetail } = ticket;
     const { ticketId } = ticketDetail;
     try {
-      const cancelPayment = await this.PaymentsRepo.softDelete({
-        paymentId: paymentId,
-      });
-      console.log(ticketId);
-      const ticketData = await this.ticketDetailRepo.findOne({
-        where: { ticketId: ticketId },
-        relations: { busDetail: true },
-      });
-      console.log(ticketData);
-      const busId = ticketData.busDetail.busId;
-      const getPassengers = await this.PassengersRepo.createQueryBuilder(
-        'passengers',
-      )
+      const isOtpSame = await this.cancelTicketRequestRepo
+        .createQueryBuilder('cancelTicketRequest')
         .where('ticketId=:ticketId', { ticketId: ticketId })
-        .getMany();
+        .andWhere('otp=:otp', { otp: otp })
+        .getOne();
+      console.log('sdfsdfgsdg', isOtpSame, otp);
+      if (isOtpSame) {
+        const cancelPayment = await this.PaymentsRepo.softDelete({
+          paymentId: paymentId,
+        });
+        console.log(ticketId);
+        const ticketData = await this.ticketDetailRepo.findOne({
+          where: { ticketId: ticketId },
+          relations: { busDetail: true },
+        });
+        console.log(ticketData);
+        const busId = ticketData.busDetail.busId;
+        const getPassengers = await this.PassengersRepo.createQueryBuilder(
+          'passengers',
+        )
+          .where('ticketId=:ticketId', { ticketId: ticketId })
+          .getMany();
 
-      console.log('getPassengers ', getPassengers);
-      getPassengers.forEach(async (element) => {
-        const delResult = await this.BusSeatsRepo.createQueryBuilder()
-          .update(BusSeats)
-          .set({
-            passengerName: null,
-            passengerAge: null,
-            passengerGender: null,
-            isBooked: false,
-          })
-          .where('seatNumber=:seatNo', { seatNo: element.seatNo })
-          .andWhere('busDetail=:busId', { busId: busId })
-          .execute();
-        console.log('deleted', delResult);
-        const incrementSeats = await this.BusDetailRepo.increment(
-          { busId: busId },
-          'availableSeats',
-          1,
-        );
-        console.log('incremented', incrementSeats);
-      });
-      const passenger = await this.PassengersRepo.softDelete({
-        ticketDetails: ticketId,
-      });
-      const delTicket = await this.ticketDetailRepo.softDelete({
-        ticketId: ticketId,
-      });
+        console.log('getPassengers ', getPassengers);
+        getPassengers.forEach(async (element) => {
+          const delResult = await this.BusSeatsRepo.createQueryBuilder()
+            .update(BusSeats)
+            .set({
+              passengerName: null,
+              passengerAge: null,
+              passengerGender: null,
+              isBooked: false,
+            })
+            .where('seatNumber=:seatNo', { seatNo: element.seatNo })
+            .andWhere('busDetail=:busId', { busId: busId })
+            .execute();
+          console.log('deleted', delResult);
+          const incrementSeats = await this.BusDetailRepo.increment(
+            { busId: busId },
+            'availableSeats',
+            1,
+          );
+          console.log('incremented', incrementSeats);
+        });
+        const passenger = await this.PassengersRepo.softDelete({
+          ticketDetails: ticketId,
+        });
+        const delTicket = await this.ticketDetailRepo.softDelete({
+          ticketId: ticketId,
+        });
+        return true;
+      } else {
+        return false;
+      }
     } catch (err) {
       console.log(err);
     }
   }
 
   async getAllTicketsByUserId(userId: number) {
-    return await this.ticketDetailRepo
-      .createQueryBuilder('tickets')
-      .leftJoinAndSelect('tickets.busDetail', 'busDetail')
-      .select('tickets.passengers')
-      .where('tickets.userId=:userId', { userId: userId })
-      .getMany();
+    try {
+      return await this.ticketDetailRepo
+        .createQueryBuilder('tickets')
+        .leftJoinAndSelect('tickets.busDetail', 'busDetail')
+        .select('tickets.passengers')
+        .where('tickets.userId=:userId', { userId: userId })
+        .getMany();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getTicketDetailsById(ticketId: number) {
-    const ticketDetails = await this.ticketDetailRepo
-      .createQueryBuilder('tickets')
-      .leftJoinAndSelect('tickets.busDetails', 'busDetails')
-      .where('tickets.ticketId=:ticketId', { ticketId: ticketId })
-      .getOne();
-    const passengersDetails = await this.PassengersRepo.createQueryBuilder(
-      'passengers',
-    )
-      .where('passengers.ticketId=:ticketId', { ticketId: ticketId })
-      .getMany();
-    return { ...ticketDetails, passengers: passengersDetails };
+    try {
+      const ticketDetails = await this.ticketDetailRepo
+        .createQueryBuilder('tickets')
+        .leftJoinAndSelect('tickets.busDetails', 'busDetails')
+        .where('tickets.ticketId=:ticketId', { ticketId: ticketId })
+        .getOne();
+      const passengersDetails = await this.PassengersRepo.createQueryBuilder(
+        'passengers',
+      )
+        .where('passengers.ticketId=:ticketId', { ticketId: ticketId })
+        .getMany();
+      return { ...ticketDetails, passengers: passengersDetails };
+    } catch (err) {
+      console.log(err);
+    }
   }
   async getTicketsByUserId(userId: number) {
     console.log(userId);
@@ -224,6 +255,24 @@ export class TicketDetailsService {
 
       console.log(passengerList);
       return passengerList;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async generateOtpToCancelTicket(payload: any, userId: any) {
+    const otp = 100000 + Math.floor(Math.random() * 900000);
+    try {
+      const result = await this.cancelTicketRequestRepo.save({
+        ticket: payload.ticketId,
+        user: userId,
+        otp: otp,
+      });
+      if (result) {
+        return otp.toString();
+      } else {
+        return false;
+      }
     } catch (err) {
       console.log(err);
     }

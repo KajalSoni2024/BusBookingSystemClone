@@ -1,6 +1,8 @@
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
 import { TicketPayment } from 'src/payments/entities/payment.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
+import { ForgetPassRequest } from './forget-pass-req.entity';
+import { CancelTicketRequest } from 'src/ticket-details/entities/cancel-ticket-req.entity';
 import {
   Entity,
   Column,
@@ -56,4 +58,13 @@ export class User {
 
   @OneToMany(() => TicketPayment, (payment) => payment.user)
   payments: TicketPayment[];
+
+  @OneToMany(() => ForgetPassRequest, (forgetPass) => forgetPass.user)
+  forgetPassList: ForgetPassRequest[];
+
+  @OneToMany(
+    () => CancelTicketRequest,
+    (cancelTicketRequest) => cancelTicketRequest.user,
+  )
+  cancelTicketRequests: CancelTicketRequest[];
 }

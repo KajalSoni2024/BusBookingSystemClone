@@ -148,7 +148,7 @@ async function pay() {
     ticketDate: ticketDate.value,
     busDetail: busId.value,
   });
-  console.log(ticket.data.ticketId);
+  console.log(ticket);
   if (ticket.status == 200) {
     const ticketId = ticket.data.ticketId;
     const addPassResult = await axiosPost("/addPassengers", {

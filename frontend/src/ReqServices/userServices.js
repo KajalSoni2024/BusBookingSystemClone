@@ -21,5 +21,16 @@ async registerUser(payload){
  },
  async getUserById(id){
    return await axiosGet(`/user/getUserById/?userId=${id}`)
- }
+ },
+async sendEmail(payload){
+  return await axiosPost('/emailer/sendEmail',payload);
+},
+async getOtpForForgetPassRequest(payload){
+  return await axiosGet(`/user/getOtpForForgetPassRequest/?email=${payload.email}`);
+},
+
+async checkForgetPassOtp(payload){
+  console.log(payload);
+  return await axiosGet(`/user/checkForgetPassOtp/?userId=${payload.userId}&opt=${payload.otp}`)
+}
 }

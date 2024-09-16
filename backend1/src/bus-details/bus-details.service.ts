@@ -43,109 +43,141 @@ export class BusDetailsService {
   }
 
   async getBusesByRoute(query: any) {
-    const result = await this.busDetailRepo
-      .createQueryBuilder('busDetail')
-      .innerJoinAndSelect('busDetail.routes', 'busId')
-      .orderBy('busId.stopNo', 'ASC')
-      .getMany();
+    try {
+      const result = await this.busDetailRepo
+        .createQueryBuilder('busDetail')
+        .innerJoinAndSelect('busDetail.routes', 'busId')
+        .orderBy('busId.stopNo', 'ASC')
+        .getMany();
 
-    const busDetails = result.filter((element) => {
-      let count = 0;
-      let stopOrder = 0;
+      const busDetails = result.filter((element) => {
+        let count = 0;
+        let stopOrder = 0;
 
-      element.routes.forEach((route) => {
-        if (count == 0) {
-          if (route.stopName == query.source) {
-            count++;
-            stopOrder = route.stopNo;
-          }
-        }
-        if (count == 1) {
-          if (route.stopName == query.dest) {
-            if (stopOrder < route.stopNo) {
+        element.routes.forEach((route) => {
+          if (count == 0) {
+            if (route.stopName == query.source) {
               count++;
-              stopOrder;
+              stopOrder = route.stopNo;
             }
           }
+          if (count == 1) {
+            if (route.stopName == query.dest) {
+              if (stopOrder < route.stopNo) {
+                count++;
+                stopOrder;
+              }
+            }
+          }
+        });
+        if (count == 2) {
+          return true;
+        } else {
+          return false;
         }
       });
-      if (count == 2) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    return busDetails;
+      return busDetails;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 
   async getAvailSeats(busId: number) {
-    return await this.busDetailRepo
-      .createQueryBuilder()
-      .select('busDetail.availableSeats')
-      .from(BusDetail, 'busDetail')
-      .where('busDetail.busId=:busId', { busId: busId })
-      .getOne();
+    try {
+      return await this.busDetailRepo
+        .createQueryBuilder()
+        .select('busDetail.availableSeats')
+        .from(BusDetail, 'busDetail')
+        .where('busDetail.busId=:busId', { busId: busId })
+        .getOne();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getTotalSeats(busId: number) {
-    return await this.busDetailRepo
-      .createQueryBuilder()
-      .select('busDetail.totalSeats')
-      .from(BusDetail, 'busDetail')
-      .where('busDetail.busId=:busId', { busId: busId })
-      .getOne();
+    try {
+      return await this.busDetailRepo
+        .createQueryBuilder()
+        .select('busDetail.totalSeats')
+        .from(BusDetail, 'busDetail')
+        .where('busDetail.busId=:busId', { busId: busId })
+        .getOne();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async decrementSeat(busId: number) {
-    return await this.busDetailRepo.decrement(
-      { busId: busId },
-      'availableSeats',
-      1,
-    );
+    try {
+      return await this.busDetailRepo.decrement(
+        { busId: busId },
+        'availableSeats',
+        1,
+      );
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getBusesWithoutConductors() {
-    // const result = await this.busDetailRepo.createQueryBuilder('bus').getMany();
-    const result = await this.busDetailRepo.find({
-      relations: {},
-      where: { conductor: IsNull(), driver: IsNull() },
-    });
-    console.log(result);
-    return result;
+    try {
+      const result = await this.busDetailRepo.find({
+        relations: {},
+        where: { conductor: IsNull(), driver: IsNull() },
+      });
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getBusSeatsByBusId(busId: number) {
-    const result = await this.busSeatsRepo
-      .createQueryBuilder('seats')
-      .where('seats.busDetail=:busId', { busId: busId })
-      .getMany();
-    return result;
+    try {
+      const result = await this.busSeatsRepo
+        .createQueryBuilder('seats')
+        .where('seats.busDetail=:busId', { busId: busId })
+        .getMany();
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getAllBuses() {
-    const result = await this.busDetailRepo.find({
-      relations: {
-        tickets: true,
-        conductor: true,
-        driver: true,
-        routes: true,
-      },
-      where: { conductor: Not(IsNull()), driver: Not(IsNull()) },
-    });
-    console.log(result);
-    return result;
+    try {
+      const result = await this.busDetailRepo.find({
+        relations: {
+          tickets: true,
+          conductor: true,
+          driver: true,
+          routes: true,
+        },
+        where: { conductor: Not(IsNull()), driver: Not(IsNull()) },
+      });
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getBusDetailsById(busId: number) {
-    const result = await this.busDetailRepo.findOne({
-      where: { busId: busId },
-      relations: {
-        routes: true,
-        conductor: true,
-        driver: true,
-      },
-    });
-    return result;
+    try {
+      const result = await this.busDetailRepo.findOne({
+        where: { busId: busId },
+        relations: {
+          routes: true,
+          conductor: true,
+          driver: true,
+        },
+      });
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async updateBusDetails(updatedDetails: any) {
@@ -245,23 +277,31 @@ export class BusDetailsService {
   }
 
   async addConductorDetails(payload: any) {
-    return await this.busDetailRepo
-      .createQueryBuilder()
-      .update(BusDetail)
-      .set({ conductor: payload.conductorId, driver: payload.driverId })
-      .where('busId=:busId', { busId: payload.busId })
-      .execute();
+    try {
+      return await this.busDetailRepo
+        .createQueryBuilder()
+        .update(BusDetail)
+        .set({ conductor: payload.conductorId, driver: payload.driverId })
+        .where('busId=:busId', { busId: payload.busId })
+        .execute();
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async getAssignedBusesById(userId: any) {
-    const result = await this.busDetailRepo
-      .createQueryBuilder('bus')
-      .leftJoinAndSelect('bus.routes', 'routes')
-      .leftJoinAndSelect('bus.conductor', 'user1')
-      .leftJoinAndSelect('bus.driver', 'user2')
-      .where('conductorId=:conductorId', { conductorId: userId })
-      .orWhere('driverId=:driverId', { driverId: userId })
-      .getMany();
-    return result;
+    try {
+      const result = await this.busDetailRepo
+        .createQueryBuilder('bus')
+        .leftJoinAndSelect('bus.routes', 'routes')
+        .leftJoinAndSelect('bus.conductor', 'user1')
+        .leftJoinAndSelect('bus.driver', 'user2')
+        .where('conductorId=:conductorId', { conductorId: userId })
+        .orWhere('driverId=:driverId', { driverId: userId })
+        .getMany();
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

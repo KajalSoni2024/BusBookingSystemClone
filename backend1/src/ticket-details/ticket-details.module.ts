@@ -7,6 +7,8 @@ import { Passengers } from 'src/passenger/entities/passenger.entity';
 import { TicketPayment } from 'src/payments/entities/payment.entity';
 import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
+import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
+import { EmailerModule } from 'src/emailer/emailer.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -15,7 +17,9 @@ import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
       TicketPayment,
       BusSeats,
       BusDetail,
+      CancelTicketRequest,
     ]),
+    EmailerModule,
   ],
   controllers: [TicketDetailsController],
   providers: [TicketDetailsService],

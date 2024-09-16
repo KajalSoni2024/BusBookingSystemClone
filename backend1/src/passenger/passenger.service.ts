@@ -17,36 +17,43 @@ export class PassengerService {
 
   async addPassengers(data: any) {
     const { ticketId, passengers, seats } = data;
-    const selectedSeats = seats.filter((seat) => seat.isSelected === 'true');
-    const ticketDetails = await this.ticketDetailRepo.findOne({
-      where: { ticketId: ticketId },
-      relations: { busDetail: true },
-    });
-    const busId = ticketDetails.busDetail.busId;
-    for (let i = 0; i < selectedSeats.length; i++) {
-      const insertSeatResult = await this.busSeatsRepo.update(
-        { seatId: selectedSeats[i].seatId },
-        {
-          passengerName: passengers[i].name,
-          passengerAge: passengers[i].age,
-          passengerGender: passengers[i].gender,
-          isBooked: true,
-        },
-      );
-      const insertPassengerResult = await this.passengerRepo.insert({
-        seatNo: selectedSeats[i].seatNumber,
-        ticketDetails: ticketId,
-        passengerName: passengers[i].name,
-        passengerGender: passengers[i].gender,
-        passengerAge: passengers[i].age,
+    const selectedSeats = seats.filter(
+      (seat: any) => seat.isSelected === 'true',
+    );
+    try {
+      const ticketDetails = await this.ticketDetailRepo.findOne({
+        where: { ticketId: ticketId },
+        relations: { busDetail: true },
       });
-      const decrementSeats = await this.busDetailRepo.decrement(
-        { busId: busId },
-        'availableSeats',
-        1,
-      );
+      const busId = ticketDetails.busDetail.busId;
+      for (let i = 0; i < selectedSeats.length; i++) {
+        const insertSeatResult = await this.busSeatsRepo.update(
+          { seatId: selectedSeats[i].seatId },
+          {
+            passengerName: passengers[i].name,
+            passengerAge: passengers[i].age,
+            passengerGender: passengers[i].gender,
+            isBooked: true,
+          },
+        );
+        const insertPassengerResult = await this.passengerRepo.insert({
+          seatNo: selectedSeats[i].seatNumber,
+          ticketDetails: ticketId,
+          passengerName: passengers[i].name,
+          passengerGender: passengers[i].gender,
+          passengerAge: passengers[i].age,
+        });
+        const decrementSeats = await this.busDetailRepo.decrement(
+          { busId: busId },
+          'availableSeats',
+          1,
+        );
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
     }
-    return true;
   }
 
   async updateSeatNo(passengerId: number, seatNo: number) {
@@ -68,12 +75,16 @@ export class PassengerService {
     if (hasTraveled == 'true') {
       isTraveled = true;
     }
-    const result = await this.passengerRepo
-      .createQueryBuilder()
-      .update(Passengers)
-      .set({ hasTraveled: isTraveled })
-      .where('passengerId=:passengerId', { passengerId: passengerId })
-      .execute();
-    return result;
+    try {
+      const result = await this.passengerRepo
+        .createQueryBuilder()
+        .update(Passengers)
+        .set({ hasTraveled: isTraveled })
+        .where('passengerId=:passengerId', { passengerId: passengerId })
+        .execute();
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
