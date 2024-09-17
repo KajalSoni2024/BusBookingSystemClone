@@ -42,5 +42,22 @@ export default {
    async cancelBookedTicket(payload){
     console.log(payload);
      return await axiosPost('/tickets/cancelBookedTicket',payload);
+   },
+
+   async getAllTicketsCanceled(){
+     return await axiosGet("/tickets/getAllCanceledTickets");
+   },
+
+   async payRefund(payload){
+    console.log(payload)
+    return await axiosPost('/payRefund',payload);
+   },
+
+   async setRefundStatusSuccess(payload){
+    return await axiosGet(`/setPaymentStatusSuccess/?ticketId=${payload.ticketId}`);
+   },
+
+   async getListOfCanceledTicketsByBusId(payload){
+    return await axiosGet(`/tickets/getListOfCanceledTicketsByBusId/?busId=${payload.busId}`)
    }
 }

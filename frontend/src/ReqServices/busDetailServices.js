@@ -30,5 +30,10 @@ export default {
         console.log(result.data)
         return result;
     },
+    async getBusDetailByBusName(payload){
+        const result = await axiosGet(`/getBusDetailByBusName/?busName=${payload.busName}&busNo=${payload.busNo}`)
+        console.log(result.data);
+        return result;
+    }
   
 }

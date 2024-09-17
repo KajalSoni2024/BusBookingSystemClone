@@ -85,6 +85,33 @@ export const actions = {
     async triggerUpdateRouteDetail({commit},payload){
         console.log(commit);
         return await routeDetailServices.updateRouteDetail(payload);
+    },
+
+    async triggerGetAllTicketsCanceled({commit}){
+        console.log(commit);
+        const result = await ticketDetailServices.getAllTicketsCanceled();
+        commit("GET_ALL_CANCELED_TICKETS",{data:result.data});
+    },
+
+    async triggerPayRefund({commit},payload){
+        console.log(commit);
+        return await ticketDetailServices.payRefund(payload);
+    },
+
+    async triggerSetRefundStatusSuccess({commit},payload){
+        console.log(commit);
+        return await ticketDetailServices.setRefundStatusSuccess(payload)
+    },
+
+    async triggerGetListOfCanceledTicketsByBusId({commit},payload){
+    const result = await ticketDetailServices.getListOfCanceledTicketsByBusId(payload);
+    commit("GET_LIST_OF_CANCELED_TICKETS_BY_BUS_ID",{data:result.data});
+    },
+
+    async triggerGetBusDetailByName({commit},payload){
+        console.log(commit);
+    return await busDetailServices.getBusDetailByBusName(payload);
     }
+
 
 };

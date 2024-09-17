@@ -108,4 +108,10 @@ export class BusDetailsController {
     );
     return result;
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getBusDetailByBusName')
+  async getBusDetailByBusName(@Query() query: any) {
+    return await this.busDetailsService.getBusDetailByBusName(query);
+  }
 }

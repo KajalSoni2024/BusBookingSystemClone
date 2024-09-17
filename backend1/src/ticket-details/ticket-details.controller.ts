@@ -82,7 +82,6 @@ export class TicketDetailsController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @UseGuards(JwtAuthGuard)
   @Post('/generateOtpToCancelTicket')
   async generateOtpToCancelTicket(@Body() body: any, @Request() req: any) {
     console.log('sdfgsdfgdfg', body);
@@ -103,5 +102,17 @@ export class TicketDetailsController {
       console.log(emailResult);
       return true;
     }
+  }
+
+  @Get('/getAllCanceledTickets')
+  async getAllCanceledTickets() {
+    return await this.ticketDetailsService.getAllCanceledTickets();
+  }
+
+  @Get('/getListOfCanceledTicketsByBusId')
+  async getListOfCanceledTicketsByBusId(@Query('busId') busId: number) {
+    return await this.ticketDetailsService.getListOfCanceledTicketsByBusId(
+      busId,
+    );
   }
 }

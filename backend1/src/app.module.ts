@@ -21,6 +21,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EmailerModule } from './emailer/emailer.module';
 import { ForgetPassRequest } from './users/entities/forget-pass-req.entity';
 import { CancelTicketRequest } from './ticket-details/entities/cancel-ticket-req.entity';
+import { TicketRefund } from './payments/entities/ticketRefund.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -43,6 +44,7 @@ import { CancelTicketRequest } from './ticket-details/entities/cancel-ticket-req
         BusSeats,
         ForgetPassRequest,
         CancelTicketRequest,
+        TicketRefund,
       ],
       synchronize: true,
     }),

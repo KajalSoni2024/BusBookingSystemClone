@@ -12,6 +12,7 @@ import {
   DeleteDateColumn,
   OneToOne,
 } from 'typeorm';
+import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
 
 @Entity()
 export class User {
@@ -45,6 +46,9 @@ export class User {
   @OneToOne(() => BusDetail, (bus) => bus.driver)
   busAssignedToDriver: BusDetail;
 
+  @OneToMany(() => TicketRefund, (ticketRefund) => ticketRefund.user)
+  refundDetails: TicketRefund[];
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 
@@ -53,6 +57,7 @@ export class User {
 
   @Column({ type: 'integer', default: 0 })
   role: number;
+
   @OneToMany(() => TicketDetail, (ticket) => ticket.user)
   tickets: TicketDetail[];
 

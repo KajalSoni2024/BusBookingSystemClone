@@ -106,6 +106,16 @@ const routes = [
     name:"SendEmail",
     component:()=>import("./components/sendEmail.vue"),
     path:"/sendEmail"
+  },
+  {
+    name:"ListOfTicketsCanceled",
+    component:()=>import("./components/listOfTicketsCanceled.vue"),
+    path:"/listOfCanceledTickets"
+  },
+  {
+    name:"TicketCancelSuccess",
+    component:()=>import("./components/TicketCancelationSuccess.vue"),
+    path:"/ticketCancelationSuccess"
   }
 
 ];

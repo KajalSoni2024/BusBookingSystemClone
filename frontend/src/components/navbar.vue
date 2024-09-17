@@ -46,6 +46,10 @@
           <v-icon>mdi-account-group-outline</v-icon>
           Users
         </v-btn>
+        <v-btn to="/listOfCanceledTickets">
+          <v-icon>mdi-toy-brick-remove</v-icon>
+          Canceled Tickets
+        </v-btn>
       </template>
       <template v-if="role==3">
         <v-btn to="/buses">
@@ -56,6 +60,10 @@
         <v-icon>mdi-bus</v-icon>
         Buses Assigned
       </v-btn>
+     <v-btn to="/listOfTicketsCanceled">
+      <v-icon></v-icon>
+      List Of Canceled Tickets
+     </v-btn>
       </template>
     </v-bottom-navigation>
   </v-layout>

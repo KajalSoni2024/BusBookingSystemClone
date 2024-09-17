@@ -1,5 +1,7 @@
 export const state = {
     allUsers:[],
     ticketDetailsById:{},
-    ticketsByUserId:[]
+    ticketsByUserId:[],
+    listOfCanceledTickets:[],
+    listOfCanceledTicketsByBusId:[]
 };

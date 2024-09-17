@@ -14,6 +14,7 @@ import { Passengers } from '../../passenger/entities/passenger.entity';
 import { TicketPayment } from '../../payments/entities/payment.entity';
 import { User } from 'src/users/entities/users.entity';
 import { CancelTicketRequest } from './cancel-ticket-req.entity';
+import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
 @Entity()
 export class TicketDetail {
   @PrimaryGeneratedColumn()
@@ -50,6 +51,9 @@ export class TicketDetail {
 
   @OneToOne(() => TicketPayment, (payment) => payment.ticketDetail)
   paymentDetail: TicketPayment;
+
+  @OneToOne(() => TicketRefund, (ticketRefund) => ticketRefund.ticketDetail)
+  refundDetail: TicketRefund;
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;

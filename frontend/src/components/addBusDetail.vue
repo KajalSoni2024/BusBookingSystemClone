@@ -116,7 +116,7 @@ watchEffect(async ()=>{
  const result = await store.dispatch("triggerGetCitiesByState",{state:selectedState.value});
    cities.value = result;
    console.log(cities.value);
-}) 
+});
 const closeAlertModal = ()=>{
  showAlert.value=true ; 
 }

@@ -3,13 +3,14 @@ import { CreateTicketDetailDto } from './dto/create-ticket-detail.dto';
 import { UpdateTicketDetailDto } from './dto/update-ticket-detail.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TicketDetail } from './entities/ticket-detail.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { Passengers } from 'src/passenger/entities/passenger.entity';
 import { TicketPayment } from 'src/payments/entities/payment.entity';
 import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { DataSource } from 'typeorm';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
 import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
+import { isNumber } from 'util';
 @Injectable()
 export class TicketDetailsService {
   constructor(
@@ -276,5 +277,46 @@ export class TicketDetailsService {
     } catch (err) {
       console.log(err);
     }
+  }
+
+  async getAllCanceledTickets() {
+    const result = await this.ticketDetailRepo
+      .createQueryBuilder('ticket')
+      .withDeleted()
+      .leftJoinAndSelect('ticket.user', 'user')
+      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+      .leftJoinAndSelect('ticket.passengers', 'passengers')
+      .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
+      .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
+      .where('ticket.deletedAt is not null')
+      .getMany();
+    console.log(result);
+    return result;
+  }
+
+  async getTicketByTicketIdWithDeletedTrue(ticketId: any) {
+    return await this.ticketDetailRepo
+      .createQueryBuilder('ticket')
+      .withDeleted()
+      .leftJoinAndSelect('ticket.user', 'user')
+      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+      .leftJoinAndSelect('ticket.passengers', 'passengers')
+      .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
+      .where('ticket.ticketId=:ticketId', { ticketId: ticketId })
+      .getOne();
+  }
+
+  async getListOfCanceledTicketsByBusId(busId: any) {
+    return await this.ticketDetailRepo
+      .createQueryBuilder('ticketDetail')
+      .withDeleted()
+      .leftJoinAndSelect('ticket.user', 'user')
+      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+      .leftJoinAndSelect('ticket.passengers', 'passengers')
+      .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
+      .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
+      .where('ticket.busDetail.busId=:busId', { busId: busId })
+      .andWhere('ticket.deletedAt is not null')
+      .getMany();
   }
 }

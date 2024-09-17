@@ -304,4 +304,16 @@ export class BusDetailsService {
       console.log(err);
     }
   }
+  async getBusDetailByBusName(query: any) {
+    const { busName, busNo } = query;
+    try {
+      return await this.busDetailRepo
+        .createQueryBuilder('busDetail')
+        .where('busName=:busName', { busName: busName })
+        .andWhere('busNo=:busNo', { busNo: busNo })
+        .getOne();
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }

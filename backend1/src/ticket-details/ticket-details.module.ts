@@ -9,6 +9,7 @@ import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
 import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
 import { EmailerModule } from 'src/emailer/emailer.module';
+import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -18,6 +19,7 @@ import { EmailerModule } from 'src/emailer/emailer.module';
       BusSeats,
       BusDetail,
       CancelTicketRequest,
+      TicketRefund,
     ]),
     EmailerModule,
   ],
