@@ -10,7 +10,9 @@ import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { DataSource } from 'typeorm';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
 import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
-import { isNumber } from 'util';
+import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
+import { Cron } from '@nestjs/schedule';
+
 @Injectable()
 export class TicketDetailsService {
   constructor(
@@ -26,6 +28,8 @@ export class TicketDetailsService {
     private BusDetailRepo: Repository<BusDetail>,
     @InjectRepository(CancelTicketRequest)
     private cancelTicketRequestRepo: Repository<CancelTicketRequest>,
+    @InjectRepository(BusRoute)
+    private BusRouteRepo: Repository<BusRoute>,
   ) {}
 
   async createTicket(data: any) {
@@ -81,19 +85,22 @@ export class TicketDetailsService {
   }
 
   async getAllBookedTicketsByUser(userId: any) {
+    console.log(userId);
     try {
       const ticketPaymentDetails = await this.PaymentsRepo.createQueryBuilder(
         'payments',
       )
         .innerJoinAndSelect('payments.ticketDetail', 'ticketDetail')
-        .where('payments.user=:userId', { userId: userId })
-        .andWhere('ticketDetail.ticketDate>:currentDate', {
+        .where('payments.userId=:userId', { userId: userId })
+        .andWhere('ticketDetail.ticketDate>=:currentDate', {
           currentDate: new Date(),
         })
         .andWhere('payments.status=:status', { status: true })
         .getMany();
 
-      const result = Promise.all(
+      console.log(ticketPaymentDetails);
+
+      const result = await Promise.all(
         ticketPaymentDetails.map(async (payment) => {
           const ticketId = payment.ticketDetail.ticketId;
           const passengerDetail = await this.ticketDetailRepo.findOne({
@@ -165,6 +172,12 @@ export class TicketDetailsService {
         const passenger = await this.PassengersRepo.softDelete({
           ticketDetails: ticketId,
         });
+        const updateCancelStatus = await this.ticketDetailRepo
+          .createQueryBuilder()
+          .update(TicketDetail)
+          .set({ hasCancelled: true })
+          .where('ticketId=:ticketId', { ticketId: ticketId })
+          .execute();
         const delTicket = await this.ticketDetailRepo.softDelete({
           ticketId: ticketId,
         });
@@ -289,6 +302,7 @@ export class TicketDetailsService {
       .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
       .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
       .where('ticket.deletedAt is not null')
+      .andWhere('hasCancelled=:isCancelled', { isCancelled: false })
       .getMany();
     console.log(result);
     return result;
@@ -308,7 +322,7 @@ export class TicketDetailsService {
 
   async getListOfCanceledTicketsByBusId(busId: any) {
     return await this.ticketDetailRepo
-      .createQueryBuilder('ticketDetail')
+      .createQueryBuilder('ticket')
       .withDeleted()
       .leftJoinAndSelect('ticket.user', 'user')
       .leftJoinAndSelect('ticket.busDetail', 'busDetail')
@@ -318,5 +332,86 @@ export class TicketDetailsService {
       .where('ticket.busDetail.busId=:busId', { busId: busId })
       .andWhere('ticket.deletedAt is not null')
       .getMany();
+  }
+
+  @Cron('* * * * *')
+  async freeUpSeatsAfterPassengerHasTraveled() {
+    const currentTime = new Date();
+    currentTime.setSeconds(0);
+    const allTickets = await this.ticketDetailRepo
+      .createQueryBuilder('ticket')
+      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+      .leftJoinAndSelect('ticket.user', 'user')
+      .leftJoinAndSelect('ticket.paymentDetail', 'paymentDetail')
+      .leftJoinAndSelect('ticket.passengers', 'passengers')
+      .where('hasCancelled=:isCancelled', { isCancelled: false })
+      .getMany();
+    const ticketsWithDepartTime = await Promise.all(
+      allTickets.map(async (ticket) => {
+        const busId = ticket.busDetail.busId;
+        const getDepartTime = await this.BusRouteRepo.createQueryBuilder(
+          'seats',
+        )
+          .where('busId=:busId', { busId: busId })
+          .andWhere('stopName=:stopName', { stopName: ticket.destination })
+          .getOne();
+
+        return { ...ticket, departTime: getDepartTime.departTime };
+      }),
+    );
+
+    ticketsWithDepartTime.forEach(async (ticket: any) => {
+      const departureTime = new Date(ticket.ticketDate);
+      const [hr, min, sec] = ticket.departTime.split(':');
+      departureTime.setHours(parseInt(hr));
+      departureTime.setMinutes(parseInt(min));
+      departureTime.setSeconds(parseInt(sec));
+      console.log('currentDate:=>' + currentTime.getTime());
+      console.log('departDate:=>' + departureTime.getTime());
+      if (departureTime.getTime() == currentTime.getTime()) {
+        console.log('yes');
+        const getPassengers = await this.PassengersRepo.createQueryBuilder(
+          'passengers',
+        )
+          .where('ticketId=:ticketId', { ticketId: ticket.ticketId })
+          .getMany();
+
+        getPassengers.forEach(async (element) => {
+          const delResult = await this.BusSeatsRepo.createQueryBuilder()
+            .update(BusSeats)
+            .set({
+              passengerName: null,
+              passengerAge: null,
+              passengerGender: null,
+              isBooked: false,
+            })
+            .where('seatNumber=:seatNo', { seatNo: element.seatNo })
+            .andWhere('busDetail=:busId', { busId: ticket.busDetail.busId })
+            .execute();
+          console.log('deleted', delResult);
+          const incrementSeats = await this.BusDetailRepo.increment(
+            { busId: ticket.busDetail.busId },
+            'availableSeats',
+            1,
+          );
+          console.log('incremented', incrementSeats);
+        });
+
+        const passenger = await this.PassengersRepo.softDelete({
+          ticketDetails: ticket.ticketId,
+        });
+        const updateCancelStatus = await this.ticketDetailRepo
+          .createQueryBuilder()
+          .update(TicketDetail)
+          .set({ hasCancelled: true })
+          .where('ticketId=:ticketId', { ticketId: ticket.ticketId })
+          .execute();
+        const delTicket = await this.ticketDetailRepo.softDelete({
+          ticketId: ticket.ticketId,
+        });
+      } else {
+        console.log('no');
+      }
+    });
   }
 }

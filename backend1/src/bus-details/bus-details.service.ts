@@ -278,12 +278,13 @@ export class BusDetailsService {
 
   async addConductorDetails(payload: any) {
     try {
-      return await this.busDetailRepo
+      const result = await this.busDetailRepo
         .createQueryBuilder()
         .update(BusDetail)
         .set({ conductor: payload.conductorId, driver: payload.driverId })
         .where('busId=:busId', { busId: payload.busId })
         .execute();
+      return result;
     } catch (err) {
       console.log(err);
     }

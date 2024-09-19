@@ -6,6 +6,24 @@ import ElementPlus from "element-plus";
 import "element-plus/dist/index.css";
 import router from "./routes";
 import store from "./store";
+import ECharts from 'vue-echarts'
+import { use } from "echarts/core"
+import {
+  CanvasRenderer
+} from 'echarts/renderers'
+import {
+  BarChart
+} from 'echarts/charts'
+import {
+  GridComponent,
+  TooltipComponent
+} from 'echarts/components'
+use([
+  CanvasRenderer,
+  BarChart,
+  GridComponent,
+  TooltipComponent
+])
 loadFonts();
 
 router.beforeEach((to, from, next) => {
@@ -24,4 +42,4 @@ router.beforeEach((to, from, next) => {
     }
   }
 });
-createApp(App).use(vuetify).use(router).use(ElementPlus).use(store).mount("#app");
+createApp(App).use(vuetify).use(router).use(ElementPlus).use(store).component('v-chart', ECharts).mount("#app");

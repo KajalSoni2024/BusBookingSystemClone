@@ -32,6 +32,9 @@ export class TicketDetail {
   @Column()
   destination: string;
 
+  @Column({ default: false })
+  hasCancelled: boolean;
+
   @OneToMany(
     () => CancelTicketRequest,
     (cancelTicketReq) => cancelTicketReq.ticket,

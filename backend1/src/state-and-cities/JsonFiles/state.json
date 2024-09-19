@@ -1,0 +1,154 @@
+[
+  {
+    "sId": 1,
+    "stateName": "Andhra Pradesh"
+  },
+  {
+    "sId": 2,
+    "stateName": "Arunachal Pradesh"
+  },
+  {
+    "sId": 3,
+    "stateName": "Assam"
+  },
+  {
+    "sId": 4,
+    "stateName": "Bihar"
+  },
+  {
+    "sId": 5,
+    "stateName": "Chhattisgarh"
+  },
+  {
+    "sId": 6,
+    "stateName": "Goa"
+  },
+  {
+    "sId": 7,
+    "stateName": "Gujarat"
+  },
+  {
+    "sId": 8,
+    "stateName": "Haryana"
+  },
+  {
+    "sId": 9,
+    "stateName": "Himachal Pradesh"
+  },
+  {
+    "sId": 10,
+    "stateName": "Jharkhand"
+  },
+  {
+    "sId": 11,
+    "stateName": "Karnataka"
+  },
+  {
+    "sId": 12,
+    "stateName": "Kerala"
+  },
+  {
+    "sId": 13,
+    "stateName": "Maharashtra"
+  },
+  {
+    "sId": 14,
+    "stateName": "Madhya Pradesh"
+  },
+  {
+    "sId": 15,
+    "stateName": "Manipur"
+  },
+  {
+    "sId": 16,
+    "stateName": "Meghalaya"
+  },
+  {
+    "sId": 17,
+    "stateName": "Mizoram"
+  },
+  {
+    "sId": 18,
+    "stateName": "Nagaland"
+  },
+  {
+    "sId": 19,
+    "stateName": "Odisha"
+  },
+  {
+    "sId": 20,
+    "stateName": "Punjab"
+  },
+  {
+    "sId": 21,
+    "stateName": "Rajasthan"
+  },
+  {
+    "sId": 22,
+    "stateName": "Sikkim"
+  },
+  {
+    "sId": 23,
+    "stateName": "Tamil Nadu"
+  },
+  {
+    "sId": 24,
+    "stateName": "Tripura"
+  },
+  {
+    "sId": 25,
+    "stateName": "Telangana"
+  },
+  {
+    "sId": 26,
+    "stateName": "Uttar Pradesh"
+  },
+  {
+    "sId": 27,
+    "stateName": "Uttarakhand"
+  },
+  {
+    "sId": 28,
+    "stateName": "West Bengal"
+  },
+  {
+    "sId": 29,
+
+    "stateName": "Andaman & Nicobar (UT)"
+  },
+  {
+    "sId": 30,
+
+    "stateName": "Chandigarh (UT)"
+  },
+  {
+    "sId": 31,
+
+    "stateName": "Dadra & Nagar Haveli and Daman & Diu (UT)"
+  },
+  {
+    "sId": 32,
+
+    "stateName": "Delhi"
+  },
+  {
+    "sId": 33,
+
+    "stateName": "Jammu & Kashmir (UT)"
+  },
+  {
+    "sId": 1,
+
+    "stateName": "Ladakh (UT)"
+  },
+  {
+    "sId": 1,
+
+    "stateName": "Lakshadweep (UT)"
+  },
+  {
+    "sId": 1,
+
+    "stateName": "Puducherry (UT)"
+  }
+]

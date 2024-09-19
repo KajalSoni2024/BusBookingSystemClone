@@ -142,4 +142,17 @@ export class UsersService {
       console.log(err);
     }
   }
+
+  async setIsAssignedToTrue(conductorId: any, driverId: any) {
+    try {
+      return await this.usersRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({ isAssigned: true })
+        .whereInIds([conductorId, driverId])
+        .execute();
+    } catch (err) {
+      console.log(err);
+    }
+  }
 }

@@ -23,6 +23,10 @@
 
           Bus
         </v-btn>
+        <v-btn to="/askYourQuery">
+          <v-icon>mdi-help-circle-outline</v-icon>
+          Ask Your Query
+        </v-btn>
       </template>
       <template v-if="role == 1">
         <v-btn to="/adminAllBuses">
@@ -50,6 +54,12 @@
           <v-icon>mdi-toy-brick-remove</v-icon>
           Canceled Tickets
         </v-btn>
+        <v-btn to="/listOfUsersHavingQuery">
+          <v-icon >
+            mdi-help-circle-outline
+          </v-icon>
+          List Of Users Query
+        </v-btn>
       </template>
       <template v-if="role==3">
         <v-btn to="/buses">
@@ -60,7 +70,7 @@
         <v-icon>mdi-bus</v-icon>
         Buses Assigned
       </v-btn>
-     <v-btn to="/listOfTicketsCanceled">
+     <v-btn to="/listOfCanceledTicketsByBusId">
       <v-icon></v-icon>
       List Of Canceled Tickets
      </v-btn>

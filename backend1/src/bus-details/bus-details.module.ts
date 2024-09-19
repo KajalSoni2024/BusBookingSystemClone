@@ -9,6 +9,7 @@ import { PassengerModule } from 'src/passenger/passenger.module';
 import { ConductorDetail } from 'src/conductor-details/entities/conductor-detail.entity';
 import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
+import { UsersModule } from 'src/users/users.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -20,6 +21,7 @@ import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
     ]),
     TicketDetailsModule,
     PassengerModule,
+    UsersModule,
   ],
   controllers: [BusDetailsController],
   providers: [BusDetailsService],

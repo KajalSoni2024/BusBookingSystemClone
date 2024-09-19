@@ -20,7 +20,7 @@
         <v-select label="State" :items="states" v-model="selectedState" item-title="state_name" item-value="state_name"></v-select>
         <v-row v-for="route in busRoutes" :key="route.id">
             <v-col>
-                <div class="d-flex flex-column"><div><p>Stop No</p></div><div><v-text-field :error-messages="vRoute$.stopNo.$errors.map((e)=>e.$message)" color="deep-orange-darken-1" type="number" v-model="route.stopNo"></v-text-field></div></div>
+                <div class="d-flex flex-column"><div><p>Stop No</p></div><div><v-text-field :error-messages="vRoute$.stopNo.$errors.map((e)=>e.$message)" color="deep-orange-darken-1" v-model="route.stopNo"></v-text-field></div></div>
             </v-col>
             <v-col>
                 <div class="d-flex flex-column"><div><p>Stop Name</p></div><div><v-select :items="cities" item-title="city_name" item-value="city_name" :error-messages="vRoute$.stopName.$errors.map((e)=>e.$message)" color="deep-orange-darken-1" v-model="route.stopName"></v-select></div></div>
@@ -82,7 +82,6 @@ const addBusDetail = async ()=>{
     const isValid = await v$.value.$validate();
     if(!isValid) return;
     const result = await store.dispatch("triggerAddBusDetail",busDetail);
-// const result = await axiosPost("/addBusDetails",busDetail);
 console.log(busRoutes);
 console.log(result)
 if(result.status==201){
@@ -102,7 +101,6 @@ const addRoutesDetails = async ()=>{
     console.log(busRouteDetails);
     try{
         const result = await store.dispatch("triggerAddBusRoute",{busRouteDetail:busRouteDetails})
-        // const result = await axiosPost("/addBusRoute",{busRouteDetail:busRouteDetails});
         if(result.status==200){
             console.log(result.data);
             showRouteForm.value=false

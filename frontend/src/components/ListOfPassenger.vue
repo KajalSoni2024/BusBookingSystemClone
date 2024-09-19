@@ -83,7 +83,7 @@ onMounted(async () => {
     busId: busId.value,
     date: date.value,
   });
-  totalSeats.value = passengersList.value[0].totalSeats;
+  totalSeats.value = passengersList?.value[0]?.totalSeats;
   totalTicketsBooked.value=passengersList.value.length;
   passengersList.value.forEach(passenger => {
     if(passenger.hasTraveled){

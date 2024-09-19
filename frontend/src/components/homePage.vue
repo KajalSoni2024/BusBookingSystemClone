@@ -8,8 +8,8 @@
     >
       <v-select label="State" :items="states" v-model="selectedState" item-title="state_name" item-value="state_name"></v-select>
     
-      <v-select label="From" :items="cities" v-model="searchData.source"  @blur="v$.source.$touch"
-       :error-messages="v$.source.$errors.map((e)=>e.$message)" item-title="city_name" item-value="city_name"></v-select>
+      <v-select label="From" :items="cities" v-model="searchData.source" item-title="city_name" item-value="city_name"  @blur="v$.source.$touch"
+       :error-messages="v$.source.$errors.map((e)=>e.$message)"></v-select>
      
        <v-select label="To" :items="cities" v-model="searchData.destination"  @blur="v$.source.$touch"
       :error-messages="v$.source.$errors.map((e)=>e.$message)" item-title="city_name" item-value="city_name"></v-select>

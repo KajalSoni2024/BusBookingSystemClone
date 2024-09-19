@@ -173,6 +173,7 @@ const addConductorDetails = async ()=>{
  if(result.status==201){
   showModal.value=false;
   showAlert.value=true;
+  await store.dispatch("triggerGetBusesWithoutConductors");
  }
 }
 onMounted(async ()=>{

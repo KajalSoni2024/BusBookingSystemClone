@@ -50,21 +50,21 @@ export class PaymentsController {
   async setPaymentStatusSuccess(@Query('ticketId') ticketId: number) {
     const result = await this.PaymentsService.setPaymentStatusSuccess(ticketId);
     console.log(result);
-    // if (result) {
-    const ticket =
-      await this.ticketDetailsService.getTicketByTicketIdWithDeletedTrue(
-        ticketId,
+    if (result) {
+      const ticket =
+        await this.ticketDetailsService.getTicketByTicketIdWithDeletedTrue(
+          ticketId,
+        );
+      console.log(ticket);
+      const email = ticket.user.email;
+      const txt = `Your Refund for the cancelation of your ticket of bus name ${ticket.busDetail.busName} scheduled on ${ticket.ticketDate} has been transferred to your account`;
+      const subject = 'Refund Of ticket Cancellation';
+      const emailMessageId = await this.emailerService.sendMail(
+        email,
+        subject,
+        txt,
       );
-    console.log(ticket);
-    const email = ticket.user.email;
-    const txt = `Your Refund for the cancelation of your ticket of bus name ${ticket.busDetail.busName} scheduled on ${ticket.ticketDate} has been transferred to your account`;
-    const subject = 'Refund Of ticket Cancellation';
-    const emailMessageId = await this.emailerService.sendMail(
-      email,
-      subject,
-      txt,
-    );
-    console.log(emailMessageId);
-    // }
+      console.log(emailMessageId);
+    }
   }
 }

@@ -61,26 +61,29 @@ async triggerResetPassword({commit},payload){
 },
 async triggerGetStatesByCountry({commit}){
 console.log(commit);
-const response = await fetch(`https://www.universal-tutorial.com/api/states/India`,{headers:{
-  method:'GET',
-  Authorization:`Bearer ${AUTH_TOKEN}`,
-  Accept:'application/json',
-}}
+const response = await fetch(`https://www.universal-tutorial.com/api/states/India`,{
+ headers:{
+ Accept:"application/json",
+ Authorization:`Bearer ${AUTH_TOKEN}`
+ }
+}
 );
 const result = await response.json();
 return result;
 },
 async triggerGetCitiesByState({commit},payload){
   console.log(commit);
-  const response = await fetch(`https://www.universal-tutorial.com/api/cities/${payload.state}`,{headers:{
-    method:'GET',
-    Authorization:`Bearer ${AUTH_TOKEN}`,
-    Accept:'application/json',
-  }}
+  const response = await fetch(`https://www.universal-tutorial.com/api/cities/${payload.state}`,{
+    headers:{
+      Accept:"application/json",
+      Authorization:`Bearer ${AUTH_TOKEN}`
+  }
+}
   );
   const result = await response.json();
   return result;
 },
+
 
 async triggerGetListOfConductors({commit}){
   console.log(commit);
@@ -141,6 +144,24 @@ async triggerGenerateOptToCancelTicket({commit},payload){
 
 async triggerCancelBookedTicket({commit},payload){
   console.log(commit);
- return await ticketDetailServices.cancelBookedTicket(payload);
+  return await ticketDetailServices.cancelBookedTicket(payload);
+}
+,
+
+async triggerSendMessage({commit},payload){
+  console.log(commit);
+  return await userService.sendMessage(payload);
+},
+
+async triggerGetMessages({commit},payload){
+  console.log("sdfsdfdsfdsfsd",payload)
+  const result =  await userService.getMessages(payload);
+  commit("GET_USER_MESSAGES",{data:result.data});
+},
+
+async triggerGetAllMessagesByChannel(){
+  const result = await userService.getAllMessagesByChannel();
+  const channelList = result.data.filter((channel)=>channel.messages.length!=0?true:false);
+  return channelList;
 }
 };

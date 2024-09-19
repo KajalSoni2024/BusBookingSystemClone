@@ -10,6 +10,8 @@ import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
 import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
 import { EmailerModule } from 'src/emailer/emailer.module';
 import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
+import { BusRoutesModule } from 'src/bus-routes/bus-routes.module';
+import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -20,8 +22,10 @@ import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
       BusDetail,
       CancelTicketRequest,
       TicketRefund,
+      BusRoute,
     ]),
     EmailerModule,
+    BusRoutesModule,
   ],
   controllers: [TicketDetailsController],
   providers: [TicketDetailsService],

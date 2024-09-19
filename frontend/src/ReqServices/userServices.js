@@ -32,5 +32,18 @@ async getOtpForForgetPassRequest(payload){
 async checkForgetPassOtp(payload){
   console.log(payload);
   return await axiosGet(`/user/checkForgetPassOtp/?userId=${payload.userId}&opt=${payload.otp}`)
-}
+},
+ async sendMessage(payload){
+  return await axiosPost('/messages/sendMessage',payload);
+ },
+
+ async getMessages(payload){
+  const result = await axiosGet(`/messages/getMessages/?receiverId=${payload.receiverId}`);
+  console.log(result.data);
+  return result;
+ },
+
+ async getAllMessagesByChannel(){
+  return await axiosGet('/messages/getAllMessagesByChannel')
+ }
 }

@@ -1,11 +1,15 @@
 <template>
-  <div v-if="!isShowListOfCanceledTickets"><v-card>
-    <p>Enter the bus name and busNo to get list of Canceled Tickets</p>
-   <div class="d-flex flex-row justify-center center align-center"><v-text-field label="Enter Bus Name" ></v-text-field><v-text-field label="Enter Bus Number"></v-text-field></div>
+  <div v-if="!isShowListOfCanceledTickets" class="d-flex flex-row justify-center align-center mt-5"><v-card class="pa-5" width="800px">
+    <p class="text-h5 ma-5 text-center">Enter the bus name and busNo to get list of Canceled Tickets</p>
+   <div class="d-flex flex-row justify-center center align-center mt-5 ga-5"><v-text-field label="Enter Bus Name" v-model="busName"></v-text-field><v-text-field label="Enter Bus Number" v-model="busNo"></v-text-field></div>
   <div class="d-flex flex-row justify-center align-center"><v-btn variant="outlined" color="green" append-icon="mdi-search" @click="getBusId">Search</v-btn></div>
   </v-card></div>
 <div v-else class="d-flex flex-row justify-center align-center">
-<v-card width="1000px" class="pa-5 border-thin" :elevation="12" v-for="ticket in listOfCanceledTickets" :key="ticket.ticketId">
+<div><v-btn class="float-left" @click="isShowListOfCanceledTickets=false">Back</v-btn></div>
+<div v-if="listOfCanceledTickets.length==0" >
+  <p class="text-center text-red text-h5">No tickets has been canceled from this bus</p>
+</div>
+<v-card v-else width="1000px" class="pa-5 border-thin" :elevation="12" v-for="ticket in listOfCanceledTickets" :key="ticket.ticketId">
       <v-row>
         <v-col>
             <v-row>
@@ -57,6 +61,12 @@
       <p>ticket Id {{ ticket.ticketId }}</p>
     </v-card>
     </div>
+    <v-dialog v-model="isShowAlert" width="auto">
+<v-card width="800px" class="pa-5">
+  <div><v-icon class="float-right" @click="isShowAlert=false">mdi-close</v-icon></div>
+  <p class="text-h5 text-center text-red">Invalid BusName or Bus Number</p>
+</v-card>
+    </v-dialog>
 </template>
 <script setup>
 import {onMounted,computed,ref} from "vue";
@@ -67,13 +77,19 @@ const route = useRoute();
 const store = useStore();
 const busName = ref(null);
 const busNo = ref(null);
+const isShowAlert = ref(false);
 const busId = ref(route.query.busId)
 const listOfCanceledTickets = computed(()=>store.state.admin.listOfCanceledTicketsByBusId);
 
 const getBusId = async ()=>{
-  const busDetail = store.dispatch("triggerGetBusDetailByName",{busName:busName.value,busNo:busNo.value});
+  const busDetail =await store.dispatch("triggerGetBusDetailByName",{busName:busName.value,busNo:busNo.value});
+  
   if(busDetail.status==200){
     await store.dispatch("triggerGetListOfCanceledTicketsByBusId",{busId:busDetail.data.busId});
+    console.log("dfgsdgdgfgfd",listOfCanceledTickets.value)
+    isShowListOfCanceledTickets.value=true;
+  }else{
+isShowAlert.value=true;
   }
 }
 onMounted(async ()=>{

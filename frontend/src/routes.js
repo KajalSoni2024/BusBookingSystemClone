@@ -116,6 +116,31 @@ const routes = [
     name:"TicketCancelSuccess",
     component:()=>import("./components/TicketCancelationSuccess.vue"),
     path:"/ticketCancelationSuccess"
+  },
+  {
+    name:"TicketCanceledByBusId",
+    component:()=>import("./components/ListOfTicketsCanceledByBusId.vue"),
+    path:"/listOfCanceledTicketsByBusId"
+  },
+  {
+    name:"AskYourQuery",
+    component:()=>import("./components/AskQuery.vue"),
+    path:"/askYourQuery"
+  },
+  {
+    name:"ListOfUsersHavingQuery",
+    component:()=>import("./components/ListOfUsersAskingQuery.vue"),
+    path:"/listOfUsersHavingQuery"
+  },
+  {
+    name:"AdminChat",
+    component:()=>import("./components/AdminChat.vue"),
+    path:"/usersQuery"
+  },
+  {
+    name:"Charts",
+    component:()=>import("./components/charts.vue"),
+    path:"/charts"
   }
 
 ];

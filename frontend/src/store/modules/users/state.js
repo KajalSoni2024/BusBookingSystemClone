@@ -12,4 +12,5 @@ export const state = {
   busDetailsById:{},
   assignedBuses:[],
   passengersList:[],
+  messages:[]
 }

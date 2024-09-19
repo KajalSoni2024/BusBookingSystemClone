@@ -18,12 +18,14 @@ import { UpdateBusDetailDto } from './dto/update-bus-detail.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.gaurd';
 import { TicketDetailsService } from 'src/ticket-details/ticket-details.service';
 import { PassengerService } from 'src/passenger/passenger.service';
+import { UsersService } from 'src/users/users.service';
 @Controller()
 export class BusDetailsController {
   constructor(
     private readonly busDetailsService: BusDetailsService,
     private readonly ticketDetailService: TicketDetailsService,
     private readonly passengerService: PassengerService,
+    private readonly userService: UsersService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -96,7 +98,16 @@ export class BusDetailsController {
   @UseGuards(JwtAuthGuard)
   @Post('/addConductorDetails')
   async addConductorDetail(@Body() payload: any) {
-    return this.busDetailsService.addConductorDetails(payload);
+    const { conductorId, driverId } = payload;
+    try {
+      const result = await this.busDetailsService.addConductorDetails(payload);
+      if (result) {
+        await this.userService.setIsAssignedToTrue(conductorId, driverId);
+      }
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   @UseGuards(JwtAuthGuard)

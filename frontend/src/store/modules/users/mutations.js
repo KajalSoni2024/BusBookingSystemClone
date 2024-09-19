@@ -36,5 +36,8 @@ export const mutations = {
   },
   GET_PASSENGERS_LIST(state,payload){
     state.passengersList=payload.data;
+  },
+  GET_USER_MESSAGES(state,payload){
+    state.messages=payload.data;
   }
 };

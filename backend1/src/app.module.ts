@@ -22,6 +22,13 @@ import { EmailerModule } from './emailer/emailer.module';
 import { ForgetPassRequest } from './users/entities/forget-pass-req.entity';
 import { CancelTicketRequest } from './ticket-details/entities/cancel-ticket-req.entity';
 import { TicketRefund } from './payments/entities/ticketRefund.entity';
+import { StateAndCitiesModule } from './state-and-cities/state-and-cities.module';
+import { MessagesModule } from './messages/messages.module';
+import { Message } from './messages/entities/message.entity';
+import { CommonModule } from './common/common.module';
+import { Channels } from './messages/entities/channel.entity';
+import { ScheduleModule } from '@nestjs/schedule';
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -45,9 +52,12 @@ import { TicketRefund } from './payments/entities/ticketRefund.entity';
         ForgetPassRequest,
         CancelTicketRequest,
         TicketRefund,
+        Message,
+        Channels,
       ],
       synchronize: true,
     }),
+    ScheduleModule.forRoot(),
     UsersModule,
     AuthModule,
     PassengerModule,
@@ -57,6 +67,9 @@ import { TicketRefund } from './payments/entities/ticketRefund.entity';
     ConductorDetailsModule,
     TicketDetailsModule,
     EmailerModule,
+    StateAndCitiesModule,
+    MessagesModule,
+    CommonModule,
   ],
 })
 export class AppModule {}

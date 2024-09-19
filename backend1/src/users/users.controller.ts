@@ -12,11 +12,13 @@ import {
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.gaurd';
 import { EmailerService } from 'src/emailer/emailer.service';
+import { MessagesService } from 'src/messages/messages.service';
 @Controller('user')
 export class UserController {
   constructor(
     private userService: UsersService,
     private emailService: EmailerService,
+    private messageService: MessagesService,
   ) {}
   @Post('/register')
   async create(
@@ -26,6 +28,10 @@ export class UserController {
     userData: any,
   ) {
     const result = await this.userService.registerUser(userData);
+    if (result) {
+      const channel = await this.messageService.createChannel(result.userId);
+      console.log(channel);
+    }
     res.status(HttpStatus.OK).json(result);
   }
 

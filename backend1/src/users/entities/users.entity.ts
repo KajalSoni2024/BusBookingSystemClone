@@ -13,6 +13,8 @@ import {
   OneToOne,
 } from 'typeorm';
 import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
+import { Message } from 'src/messages/entities/message.entity';
+import { Channels } from 'src/messages/entities/channel.entity';
 
 @Entity()
 export class User {
@@ -67,9 +69,21 @@ export class User {
   @OneToMany(() => ForgetPassRequest, (forgetPass) => forgetPass.user)
   forgetPassList: ForgetPassRequest[];
 
+  @OneToMany(() => Message, (message) => message.sender)
+  senderMsgs: Message[];
+
+  @OneToMany(() => Message, (message) => message.receiver)
+  receiverMsgs: Message[];
+
   @OneToMany(
     () => CancelTicketRequest,
     (cancelTicketRequest) => cancelTicketRequest.user,
   )
   cancelTicketRequests: CancelTicketRequest[];
+
+  @OneToMany(() => Channels, (channel) => channel.user1)
+  adminChannels: Channels[];
+
+  @OneToOne(() => Channels, (channel) => channel.user2)
+  userChannel: Channels;
 }
