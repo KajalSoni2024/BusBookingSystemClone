@@ -86,6 +86,11 @@ export class TicketDetailsService {
 
   async getAllBookedTicketsByUser(userId: any) {
     console.log(userId);
+    const currentDate = new Date();
+    currentDate.setHours(0);
+    currentDate.setMinutes(0);
+    currentDate.setSeconds(0);
+    currentDate.setMilliseconds(0);
     try {
       const ticketPaymentDetails = await this.PaymentsRepo.createQueryBuilder(
         'payments',
@@ -93,7 +98,7 @@ export class TicketDetailsService {
         .innerJoinAndSelect('payments.ticketDetail', 'ticketDetail')
         .where('payments.userId=:userId', { userId: userId })
         .andWhere('ticketDetail.ticketDate>=:currentDate', {
-          currentDate: new Date(),
+          currentDate: currentDate,
         })
         .andWhere('payments.status=:status', { status: true })
         .getMany();
@@ -338,6 +343,7 @@ export class TicketDetailsService {
   async freeUpSeatsAfterPassengerHasTraveled() {
     const currentTime = new Date();
     currentTime.setSeconds(0);
+    currentTime.setMilliseconds(0);
     const allTickets = await this.ticketDetailRepo
       .createQueryBuilder('ticket')
       .leftJoinAndSelect('ticket.busDetail', 'busDetail')
@@ -363,11 +369,9 @@ export class TicketDetailsService {
     ticketsWithDepartTime.forEach(async (ticket: any) => {
       const departureTime = new Date(ticket.ticketDate);
       const [hr, min, sec] = ticket.departTime.split(':');
-      departureTime.setHours(parseInt(hr));
-      departureTime.setMinutes(parseInt(min));
-      departureTime.setSeconds(parseInt(sec));
-      console.log('currentDate:=>' + currentTime.getTime());
-      console.log('departDate:=>' + departureTime.getTime());
+      departureTime.setHours(parseInt(hr), parseInt(min), parseInt(sec), 0);
+      console.log('currentDate:=>' + currentTime.getTime() + currentTime);
+      console.log('departDate:=>' + departureTime.getTime() + departureTime);
       if (departureTime.getTime() == currentTime.getTime()) {
         console.log('yes');
         const getPassengers = await this.PassengersRepo.createQueryBuilder(

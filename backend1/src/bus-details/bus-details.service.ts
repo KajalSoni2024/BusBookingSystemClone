@@ -317,4 +317,11 @@ export class BusDetailsService {
       console.log(err);
     }
   }
+  async getTotalBuses() {
+    try {
+      return await this.busDetailRepo.createQueryBuilder().getCount();
+    } catch (err) {
+      throw err;
+    }
+  }
 }

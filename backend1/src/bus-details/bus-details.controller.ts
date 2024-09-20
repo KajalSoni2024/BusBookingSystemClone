@@ -125,4 +125,10 @@ export class BusDetailsController {
   async getBusDetailByBusName(@Query() query: any) {
     return await this.busDetailsService.getBusDetailByBusName(query);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getTotalBuses')
+  async getTotalBuses() {
+    return await this.busDetailsService.getTotalBuses();
+  }
 }

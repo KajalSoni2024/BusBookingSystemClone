@@ -87,4 +87,42 @@ export class PassengerService {
       console.log(err);
     }
   }
+
+  async getTotalPassengersTraveledToday() {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    console.log('current date:=>' + currentDate);
+    const totalPassengers = await this.passengerRepo
+      .createQueryBuilder('passengers')
+      .withDeleted()
+      .leftJoinAndSelect('passengers.ticketDetails', 'ticketDetails')
+      .where('ticketDetails.ticketDate=:currentDate', {
+        currentDate: currentDate,
+      })
+      .getCount();
+
+    return totalPassengers;
+  }
+
+  async getPassengersTraveledPerMonth() {
+    const currentYear = new Date().getFullYear();
+    try {
+      const result = await this.passengerRepo
+        .createQueryBuilder('passengers')
+        .withDeleted()
+        .select(
+          'EXTRACT(MONTH FROM ticketDetails.ticketDate) AS month, COUNT(*) AS count',
+        )
+        .leftJoin('passengers.ticketDetails', 'ticketDetails')
+        .where('EXTRACT(YEAR FROM ticketDetails.ticketDate) = :currentYear', {
+          currentYear,
+        })
+        .groupBy('month')
+        .getRawMany();
+      console.log(result);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
 }

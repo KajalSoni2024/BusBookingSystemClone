@@ -2,6 +2,7 @@ import busDetailServices from "@/ReqServices/busDetailServices";
 import routeDetailServices from "@/ReqServices/routeDetailServices";
 import conductorDetailServices from "@/ReqServices/conductorDetailServices";
 import ticketDetailServices from "@/ReqServices/ticketDetailServices";
+import adminServices from "@/ReqServices/adminServices";
 import userServices from "@/ReqServices/userServices";
 export const actions = {
    async triggerGetAllUsers({commit}){
@@ -111,7 +112,32 @@ export const actions = {
     async triggerGetBusDetailByName({commit},payload){
         console.log(commit);
     return await busDetailServices.getBusDetailByBusName(payload);
+    },
+    
+    async triggerGetTotalUsers(){
+      return await adminServices.getTotalUsers();
+    },
+    async triggerGetTotalBuses(){
+        return await adminServices.getTotalBuses();
+    },
+    async triggerGetTotalPeopleTraveled(){
+       return await adminServices.getTotalTicketsBooked()
+    },
+
+    async triggerGetTotalCancelledTickets(){
+        return await adminServices.getTotalCancelledTickets()
+    },
+
+    async triggerGetUsersRegisteredPerMonth(){
+        return await adminServices.getUsersRegisteredPerMonth()
+    },
+
+    async triggerGetPassengersTraveledPerMonth(){
+        return await adminServices.getPassengersTraveledPerMonth()
+    },
+
+    async triggerGetRecentlyRegisteredUser(){
+        return await adminServices.getRecentlyRegisteredUser()
     }
-
-
+    
 };

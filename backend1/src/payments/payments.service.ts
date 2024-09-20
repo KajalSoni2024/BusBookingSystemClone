@@ -114,4 +114,20 @@ export class PaymentsService {
       console.log(err);
     }
   }
+
+  async getTotalTicketsCancelledToday() {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    try {
+      const result = await this.paymentRepo
+        .createQueryBuilder('payments')
+        .withDeleted()
+        .where('payments.deletedAt=:currentDate', { currentDate: currentDate })
+        .getCount();
+      console.log(result);
+      return result;
+    } catch (err) {
+      throw new Error(err);
+    }
+  }
 }

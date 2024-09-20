@@ -28,4 +28,14 @@ export class PassengerController {
   async updatePassengersTraveledStatus(@Query() query: any) {
     return await this.passengerService.updatePassengersTraveledStatus(query);
   }
+
+  @Get('/getTotalPassengersTraveledToday')
+  async getTotalPassengersTraveledToday() {
+    return await this.passengerService.getTotalPassengersTraveledToday();
+  }
+
+  @Get('/getPassengersTraveledPerMonth')
+  async getPassengersTraveledPerMonth() {
+    return await this.passengerService.getPassengersTraveledPerMonth();
+  }
 }

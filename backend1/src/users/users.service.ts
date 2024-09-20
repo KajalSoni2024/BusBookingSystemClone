@@ -155,4 +155,64 @@ export class UsersService {
       console.log(err);
     }
   }
+
+  async getTotalUsers() {
+    try {
+      return await this.usersRepository.createQueryBuilder('users').getCount();
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
+  }
+  async getUsersRegisteredPerMonth() {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    console.log(currentYear);
+    try {
+      const users = await this.usersRepository
+        .createQueryBuilder('users')
+        .select(
+          'EXTRACT(MONTH FROM createdAt) AS month, COUNT(*) AS totalUsers',
+        )
+        .where('EXTRACT(YEAR FROM createdAt) = :currentYear', { currentYear })
+        .groupBy('month')
+        .orderBy('month')
+        .getRawMany();
+      console.log(users);
+      return users;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async getRecentlyRegisteredUser() {
+    const currentDate = new Date();
+    const monthDiff = 2;
+    try {
+      const users = await this.usersRepository
+        .createQueryBuilder('users')
+        .select([
+          'firstName',
+          'lastName',
+          'gender',
+          'contact',
+          'email',
+          'createdAt',
+          'userId',
+        ])
+        .addSelect(
+          `(${currentDate.getMonth() + 1} - EXTRACT(MONTH FROM createdAt)) AS monthDiff`,
+        )
+        .where('EXTRACT(YEAR FROM createdAt)=:currentYear', {
+          currentYear: currentDate.getFullYear(),
+        })
+        .andWhere('role=:role', { role: 0 })
+        .having('monthDiff<=:monthDiff', { monthDiff })
+        .printSql()
+        .getRawMany();
+      console.log(users);
+      return users;
+    } catch (err) {
+      throw err;
+    }
+  }
 }

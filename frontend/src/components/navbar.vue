@@ -6,23 +6,27 @@
       grow
     >
       <template v-if="role == 0">
+
+        <v-btn to="/dashboard">
+          <v-icon>mdi-view-dashboard</v-icon>
+          DashBoard
+        </v-btn>
+
         <v-btn to="/home">
           <v-icon>mdi-home-outline</v-icon>
-
-          Home
+          Search Trains
         </v-btn>
 
         <v-btn to="/myBooking">
           <v-icon>mdi-book-account</v-icon>
-
           Booking
         </v-btn>
 
         <v-btn to="/buses">
           <v-icon>mdi-bus</v-icon>
-
           Bus
         </v-btn>
+
         <v-btn to="/askYourQuery">
           <v-icon>mdi-help-circle-outline</v-icon>
           Ask Your Query

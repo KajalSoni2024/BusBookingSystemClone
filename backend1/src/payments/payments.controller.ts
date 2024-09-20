@@ -46,6 +46,7 @@ export class PaymentsController {
     res.status(HttpStatus.OK).json(result);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/setPaymentStatusSuccess')
   async setPaymentStatusSuccess(@Query('ticketId') ticketId: number) {
     const result = await this.PaymentsService.setPaymentStatusSuccess(ticketId);
@@ -66,5 +67,11 @@ export class PaymentsController {
       );
       console.log(emailMessageId);
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getTotalTicketsCancelledToday')
+  async getTotalTicketsCancelledToday() {
+    return await this.PaymentsService.getTotalTicketsCancelledToday();
   }
 }

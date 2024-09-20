@@ -91,4 +91,21 @@ export class UserController {
   async checkForgetPassOtp(@Query() query: any) {
     return this.userService.checkForgetPassOtp(query);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getTotalUsers')
+  async getTotalUsers() {
+    return await this.userService.getTotalUsers();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getUsersRegisteredPerMonth')
+  async getUsersRegisteredPerMonth() {
+    return await this.userService.getUsersRegisteredPerMonth();
+  }
+
+  @Get('/getRecentlyRegisteredUser')
+  async getRecentlyRegisteredUser() {
+    return await this.userService.getRecentlyRegisteredUser();
+  }
 }

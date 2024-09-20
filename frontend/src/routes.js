@@ -138,11 +138,10 @@ const routes = [
     path:"/usersQuery"
   },
   {
-    name:"Charts",
-    component:()=>import("./components/charts.vue"),
-    path:"/charts"
+    name:"DashBoard",
+    component:()=>import("./components/Dashboard.vue"),
+    path:"/dashboard"
   }
-
 ];
 
 const router = createRouter({
