@@ -1,20 +1,20 @@
 <template>
   <v-app>
     <template v-if="token != null">
-      <Header />
+      <Header class="header" />
     </template>
-    <v-main>
+    <v-main class="scrollable">
       <router-view></router-view>
     </v-main>
     <template v-if="token != null">
-      <Navbar />
+      <Navbar class="footer" />
     </template>
   </v-app>
 </template>
 
 <script setup>
-import Navbar from "./components/navbar.vue";
-import Header from "./components/header.vue";
+import Navbar from "./components/GeneralComponents/navbar.vue";
+import Header from "./components/GeneralComponents/header.vue";
 import { onMounted, computed } from "vue";
 import { useStore } from "vuex";
 const token = computed(() => {
@@ -29,5 +29,21 @@ onMounted(async () => {
   };
   store.commit("SET_AUTH", payload);
 });
+
 </script>
-<style scoped></style>
+<style scoped>
+.header{
+top:0;
+width: 100%;
+position: relative;
+}
+.footer{
+  bottom:0;
+  width:100%;
+  position: fixed;
+}
+.scrollable{
+  overflow-y: auto;
+  max-height: 100vh;
+}
+</style>

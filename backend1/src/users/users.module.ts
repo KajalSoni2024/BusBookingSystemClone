@@ -8,6 +8,7 @@ import { ForgetPassRequest } from './entities/forget-pass-req.entity';
 import { EmailerModule } from 'src/emailer/emailer.module';
 import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
 import { MessagesModule } from 'src/messages/messages.module';
+import { CommonModule } from 'src/common/common.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -18,6 +19,7 @@ import { MessagesModule } from 'src/messages/messages.module';
     ]),
     EmailerModule,
     MessagesModule,
+    CommonModule,
   ],
   providers: [UsersService],
   controllers: [UserController],

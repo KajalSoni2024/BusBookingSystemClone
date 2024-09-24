@@ -1,6 +1,6 @@
 <template>
     <div v-if="buses.length==0"><h1 class="text-h5 text-center text-red mt-5">No Buses Available</h1></div>
-    <div v-else class="d-flex flex-row justify-center align-center">
+    <div v-else class="d-flex flex-column justify-center align-center">
         <template v-for="bus in buses" :key="bus.busId">
             <v-card v-if="bus.routes.length>0" width="1000px" class="ma-8 pa-5" :elevation="12">
         <v-row>
@@ -8,7 +8,7 @@
             ><v-img
               max-height="180px"
               max-width="100px"
-              src="../../public/bus.jpg"
+              src="../../../public/bus.jpg"
             ></v-img
           ></v-col>
           <v-col md="6">

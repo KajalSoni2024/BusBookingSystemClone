@@ -6,12 +6,6 @@
       grow
     >
       <template v-if="role == 0">
-
-        <v-btn to="/dashboard">
-          <v-icon>mdi-view-dashboard</v-icon>
-          DashBoard
-        </v-btn>
-
         <v-btn to="/home">
           <v-icon>mdi-home-outline</v-icon>
           Search Trains
@@ -33,6 +27,10 @@
         </v-btn>
       </template>
       <template v-if="role == 1">
+        <v-btn to="/dashboard">
+          <v-icon>mdi-view-dashboard</v-icon>
+          DashBoard
+        </v-btn>
         <v-btn to="/adminAllBuses">
           <v-icon>mdi-history</v-icon>
 
@@ -54,8 +52,11 @@
           <v-icon>mdi-account-group-outline</v-icon>
           Users
         </v-btn>
-        <v-btn to="/listOfCanceledTickets">
-          <v-icon>mdi-toy-brick-remove</v-icon>
+        <v-btn to="/listOfCanceledTickets" stacked="">
+          <v-badge color="error"
+          :content="totalCancelledTicket">
+            <v-icon>mdi-toy-brick-remove</v-icon>
+          </v-badge>
           Canceled Tickets
         </v-btn>
         <v-btn to="/listOfUsersHavingQuery">
@@ -74,8 +75,8 @@
         <v-icon>mdi-bus</v-icon>
         Buses Assigned
       </v-btn>
-     <v-btn to="/listOfCanceledTicketsByBusId">
-      <v-icon></v-icon>
+     <v-btn class="text-center" to="/listOfCanceledTicketsByBusId">
+      <v-icon>mdi-list-status</v-icon>
       List Of Canceled Tickets
      </v-btn>
       </template>
@@ -85,10 +86,27 @@
 
 <script setup>
 import { useStore } from "vuex";
-import { computed } from "vue";
+import { computed,ref, onMounted } from "vue";
+import Pusher from "pusher-js";
 const store = useStore();
 const role = computed(() => {
   return store.state.users.role;
 });
+const totalCancelledTicket = ref(0);
+onMounted(async()=>{
+const pusher = new Pusher("5255d55b22b71ccf514f", { cluster: "ap2" });
+totalCancelledTicket.value = await store.dispatch("triggerGetTotalCancelledTicketsWithPendingRefund")
+pusher.subscribe('ticketCancelled')
+pusher.bind('isCancelled',(data)=>{
+  console.log("sdfsdfsdfs cancelled",data);
+ totalCancelledTicket.value = totalCancelledTicket.value++;
+})
+pusher.subscribe('refundPaid')
+pusher.bind('refundData',(data)=>{
+  console.log(data);
+  console.log("refund received ");
+  totalCancelledTicket.value= totalCancelledTicket.value--;
+})
+})
 </script>
 <style scoped></style>

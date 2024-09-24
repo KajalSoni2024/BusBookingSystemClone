@@ -29,11 +29,13 @@ export class PassengerController {
     return await this.passengerService.updatePassengersTraveledStatus(query);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getTotalPassengersTraveledToday')
   async getTotalPassengersTraveledToday() {
     return await this.passengerService.getTotalPassengersTraveledToday();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getPassengersTraveledPerMonth')
   async getPassengersTraveledPerMonth() {
     return await this.passengerService.getPassengersTraveledPerMonth();

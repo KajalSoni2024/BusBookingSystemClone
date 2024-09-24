@@ -62,10 +62,9 @@
         </v-row>
         </v-col>
         <v-col>
-          <div class="d-flex flex-row justify-center align-center"><v-btn variant="outlined" color="green" @click="payRefund(ticket)">Pay Refund</v-btn></div>
+          <div v-if="ticket.refundDetail===null" class="d-flex flex-row justify-center align-center"><v-btn variant="outlined" color="green" @click="payRefund(ticket)">Pay Refund</v-btn></div>
         </v-col>
        </v-row>
-      <p>ticket Id {{ ticket.ticketId }}</p>
     </v-card></div>
 </template>
 <script setup>

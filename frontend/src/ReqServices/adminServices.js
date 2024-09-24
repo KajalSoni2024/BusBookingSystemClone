@@ -15,28 +15,77 @@ export default {
 
     async getTotalTicketsBooked(){
         const result = await axiosGet('/getTotalPassengersTraveledToday');
-        console.log(result.data);
-        return result.data;
+        if(result.status==200){
+            console.log(result.data);
+            return result.data;
+        }else{
+            return result
+        }
     },
 
     async getTotalCancelledTickets(){
         const result = await axiosGet("/getTotalTicketsCancelledToday");
-        console.log(result.data);
-        return result.data;
+        if(result.status==200){
+            console.log("total cancelled tickets ", result.data);
+            return result.data;
+        }else{
+            return result;
+        }
+     
     },
 
     async getUsersRegisteredPerMonth(){
         const result = await axiosGet('/user/getUsersRegisteredPerMonth');
-        return result.data;
+        if(result.status==200){
+            return result.data;
+        }else{
+           return result;
+        }
     },
 
     async getPassengersTraveledPerMonth(){
         const result = await axiosGet('/getPassengersTraveledPerMonth');
-        return result.data;
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
+      
     },
 
     async getRecentlyRegisteredUser(){
         const result = await axiosGet('/user/getRecentlyRegisteredUser');
-        return result.data;
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
+    },
+
+    async getTotalBusesPerState(){
+        const result = await axiosGet('/getTotalBusesPerState');
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
+    },
+
+    async getTotalTicketsCancelledPerMonth(){
+        const result = await axiosGet('/getTotalTicketsCancelledPerMonth');
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
+    },
+
+    async getTotalCancelledTicketsWithPendingRefund(){
+        const result = await axiosGet('/getTotalCancelledTicketsWithPendingRefund');
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
     }
 }

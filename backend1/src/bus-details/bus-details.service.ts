@@ -8,6 +8,7 @@ import { BusSeats } from './entities/bus-seats.entity';
 import { ConductorDetail } from 'src/conductor-details/entities/conductor-detail.entity';
 import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
 import { identity } from 'rxjs';
+import { PusherService } from 'src/common/services/pusher.service';
 
 @Injectable()
 export class BusDetailsService {
@@ -20,6 +21,7 @@ export class BusDetailsService {
     private conductorDetailRepo: Repository<ConductorDetail>,
     @InjectRepository(BusRoute)
     private busRouteRepo: Repository<BusRoute>,
+    private pusherService: PusherService,
   ) {}
   async create(createBusDetailDto: any) {
     try {
@@ -35,7 +37,9 @@ export class BusDetailsService {
           busDetail: busDetail.busId,
         });
       }
-
+      if (busDetail) {
+        this.pusherService.triggerChannel('newBusAdded', 'busData', busDetail);
+      }
       return busDetail;
     } catch (error) {
       console.log(error);
@@ -321,6 +325,21 @@ export class BusDetailsService {
     try {
       return await this.busDetailRepo.createQueryBuilder().getCount();
     } catch (err) {
+      throw err;
+    }
+  }
+
+  async getTotalBusesPerState() {
+    try {
+      const result = await this.busDetailRepo
+        .createQueryBuilder('buses')
+        .select('state, COUNT(*) AS count')
+        .groupBy('state')
+        .getRawMany();
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
       throw err;
     }
   }

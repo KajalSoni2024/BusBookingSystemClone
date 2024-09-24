@@ -6,21 +6,21 @@
     <v-form>
         <v-text-field label="Bus Name" color="deep-orange-darken-1" @blur="v$.busName.$touch" :error-messages="v$.busName.$errors.map((e)=>e.$message)" v-model="busDetail.busName"></v-text-field>
         <v-text-field label="Bus Number"  color="deep-orange-darken-1" @blur="v$.busNo.$touch" :error-messages="v$.busNo.$errors.map((e)=>e.$message)" v-model="busDetail.busNo"></v-text-field>
+        <v-select label="Select State" :items="states" v-model="busDetail.state" item-title="state_name" item-value="state_name"></v-select>
         <v-text-field label="Total Seats"  color="deep-orange-darken-1" @blur="v$.totalSeats.$touch" :error-messages="v$.totalSeats.$errors.map((e)=>e.$message)" v-model="busDetail.totalSeats"></v-text-field>
         <v-text-field label="Price"  color="deep-orange-darken-1" @blur="v$.price.$touch" :error-messages="v$.price.$errors.map((e)=>e.$message)" v-model="busDetail.price"></v-text-field>
         
         <div class="d-flex flex-row justify-center align-center">
             <v-btn @click="addBusDetail">Add Details</v-btn>
         </div>
-    </v-form> 
+    </v-form>
     </v-card>
 </div>
 <v-dialog width="auto" v-model="showRouteForm">
-    <v-card class="pa-5">
-        <v-select label="State" :items="states" v-model="selectedState" item-title="state_name" item-value="state_name"></v-select>
+    <v-card width="800px" class="pa-5">
         <v-row v-for="route in busRoutes" :key="route.id">
             <v-col>
-                <div class="d-flex flex-column"><div><p>Stop No</p></div><div><v-text-field :error-messages="vRoute$.stopNo.$errors.map((e)=>e.$message)" color="deep-orange-darken-1" v-model="route.stopNo"></v-text-field></div></div>
+                <div class="d-flex flex-column"><div><p>Stop No</p></div><div><v-text-field type="number" :error-messages="vRoute$.stopNo.$errors.map((e)=>e.$message)" color="deep-orange-darken-1" v-model="route.stopNo"></v-text-field></div></div>
             </v-col>
             <v-col>
                 <div class="d-flex flex-column"><div><p>Stop Name</p></div><div><v-select :items="cities" item-title="city_name" item-value="city_name" :error-messages="vRoute$.stopName.$errors.map((e)=>e.$message)" color="deep-orange-darken-1" v-model="route.stopName"></v-select></div></div>
@@ -45,9 +45,9 @@
 import {useVuelidate} from "@vuelidate/core";
 import {required,helpers} from "@vuelidate/validators";
 import {reactive, ref, computed, onMounted,watchEffect} from "vue"
-import AlertModal from "./AlertModal.vue"
+import AlertModal from "../GeneralComponents/AlertModal.vue"
 import {useStore} from "vuex";
-import { onlyChars , isVehicleNo, isOnlyDigits} from "../../public/validation";
+import { onlyChars , isVehicleNo, isOnlyDigits} from "../../../public/validation";
 const showAlert = ref(false);
 const store = useStore();
 const states = ref([]);
@@ -56,9 +56,10 @@ const busDetail = reactive({
     busName:null,
     busNo:null,
     totalSeats:null,
-    price:null
+    price:null,
+    state:'Gujarat'
 });
-const selectedState = ref('Gujarat');
+
 const busId = ref(null);
 const showRouteForm = ref(false);
 const busRoutes = reactive([{id:1,stopName:null, stopNo:null,arrivalTime:null, departTime:null}]);
@@ -104,6 +105,11 @@ const addRoutesDetails = async ()=>{
         if(result.status==200){
             console.log(result.data);
             showRouteForm.value=false
+            busDetail.busName='';
+            busDetail.busNo='';
+            busDetail.totalSeats='';
+            busDetail.price='';
+            busDetail.state='Gujarat'
         }
     }catch(err){
         console.log(err)
@@ -111,15 +117,16 @@ const addRoutesDetails = async ()=>{
 }
 
 watchEffect(async ()=>{
- const result = await store.dispatch("triggerGetCitiesByState",{state:selectedState.value});
+ const result = await store.dispatch("triggerGetCitiesByState",{state:busDetail.state});
    cities.value = result;
    console.log(cities.value);
-});
+},{deep:true});
 const closeAlertModal = ()=>{
  showAlert.value=true ; 
 }
 onMounted(async ()=>{
   states.value = await store.dispatch("triggerGetStatesByCountry");
+  
 })
 </script>
 <style scoped></style>

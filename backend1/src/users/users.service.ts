@@ -6,7 +6,7 @@ import { UserType } from './interfaces/user.interface';
 import * as bcrypt from 'bcrypt';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { ForgetPassRequest } from './entities/forget-pass-req.entity';
-
+import { PusherService } from 'src/common/services/pusher.service';
 @Injectable()
 export class UsersService {
   constructor(
@@ -16,6 +16,7 @@ export class UsersService {
     private ticketDetailRepo: Repository<TicketDetail>,
     @InjectRepository(ForgetPassRequest)
     private forgetPassRequestRepo: Repository<ForgetPassRequest>,
+    private pusherService: PusherService,
   ) {}
 
   async registerUser(userData: any) {
@@ -28,6 +29,13 @@ export class UsersService {
         return await EntityManager.save(User, userData);
       },
     );
+    if (response) {
+      this.pusherService.triggerChannel(
+        'newUserRegistered',
+        'userData',
+        response,
+      );
+    }
     return response;
   }
 

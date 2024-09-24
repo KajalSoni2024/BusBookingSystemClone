@@ -138,6 +138,18 @@ export const actions = {
 
     async triggerGetRecentlyRegisteredUser(){
         return await adminServices.getRecentlyRegisteredUser()
+    },
+
+    async triggerGetTotalBusesPerState(){
+        return await adminServices.getTotalBusesPerState();
+    },
+
+    async triggerGetTotalTicketsCancelledPerMonth(){
+        return await adminServices.getTotalTicketsCancelledPerMonth()
+    },
+
+    async triggerGetTotalCancelledTicketsWithPendingRefund(){
+        return await adminServices.getTotalCancelledTicketsWithPendingRefund()
     }
-    
+  
 };

@@ -8,7 +8,7 @@
             ><v-img
               max-height="180px"
               max-width="100px"
-              src="../../public/bus.jpg"
+              src="../../../public/bus.jpg"
             ></v-img
           ></v-col>
           <v-col md="6">

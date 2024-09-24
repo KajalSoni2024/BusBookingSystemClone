@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/users.entity';
 import { TicketRefund } from './entities/ticketRefund.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
+import { PusherService } from 'src/common/services/pusher.service';
 
 const stripe = require('stripe')(
   'sk_test_51PbaP8JlehMaIxjH8ih7mWf2DpABoFMv28R76jwGxh1XL8fxJeQtbDg56N2A7ycBzO7Egic5shOYNPYbfN5epBZS00AqT1ttlU',
@@ -16,6 +17,7 @@ export class PaymentsService {
     private paymentRepo: Repository<TicketPayment>,
     @InjectRepository(TicketRefund)
     private ticketRefundRepo: Repository<TicketRefund>,
+    private readonly pusherService: PusherService,
   ) {}
 
   async makePayment(paymentData: any, user: User) {
@@ -91,6 +93,7 @@ export class PaymentsService {
         })
         .execute();
 
+      this.pusherService.triggerChannel('refundPaid', 'refundData', true);
       return { id: session.id, result: result };
     } catch (err) {
       console.log(err);
@@ -118,16 +121,79 @@ export class PaymentsService {
   async getTotalTicketsCancelledToday() {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth() + 1; // Adjust for 1-based month
+    const currentDateDay = currentDate.getDate();
     try {
       const result = await this.paymentRepo
         .createQueryBuilder('payments')
         .withDeleted()
-        .where('payments.deletedAt=:currentDate', { currentDate: currentDate })
+        .where('deletedAt IS NOT NULL')
+        .andWhere('EXTRACT(YEAR FROM deletedAt) = :currentYear', {
+          currentYear,
+        })
+        .andWhere('EXTRACT(MONTH FROM deletedAt) = :currentMonth', {
+          currentMonth,
+        })
+        .andWhere('EXTRACT(DAY FROM deletedAt) = :currentDate', {
+          currentDate: currentDateDay,
+        })
         .getCount();
       console.log(result);
       return result;
     } catch (err) {
-      throw new Error(err);
+      console.log(err);
+    }
+  }
+
+  async getTotalTicketsCancelledPerMonth() {
+    const currentYear = new Date().getFullYear();
+    console.log(currentYear);
+    const result = await this.paymentRepo
+      .createQueryBuilder('payments')
+      .withDeleted()
+      .select('EXTRACT(MONTH FROM deletedAt) AS month, COUNT(*) AS count')
+      .where('deletedAt is not null')
+      .andWhere('EXTRACT(YEAR FROM deletedAt)=:currentYear', { currentYear })
+      .groupBy('month')
+      .orderBy('month')
+      .printSql()
+      .getRawMany();
+    console.log('getTotalTicketsCancelledPerMonth:=>', result);
+    return result;
+  }
+
+  async getTotalCancelledTicketsWithPendingRefund() {
+    try {
+      const cancelledTickets = await this.paymentRepo
+        .createQueryBuilder('ticket')
+        .withDeleted()
+        .select('ticketDetail.ticketId AS ticketId')
+        .leftJoin('ticket.ticketDetail', 'ticketDetail')
+        .where('ticket.deletedAt is not null')
+        .getRawMany();
+
+      console.log(cancelledTickets);
+
+      const countArr = await Promise.all(
+        cancelledTickets.map(async (ticket) => {
+          const checkRefundReceived = await this.ticketRefundRepo
+            .createQueryBuilder('refund')
+            .where('ticketId=:ticketId', { ticketId: ticket.ticketId })
+            .andWhere('status=:status', { status: true })
+            .getOne();
+          console.log(checkRefundReceived);
+          return checkRefundReceived ? 0 : 1;
+        }),
+      );
+      const count = countArr.reduce((sum: any, count: any) => {
+        return (sum += count);
+      });
+      console.log('count ' + count);
+      return count;
+    } catch (err) {
+      console.log(err);
+      throw err;
     }
   }
 }

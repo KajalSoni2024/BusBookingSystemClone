@@ -34,7 +34,7 @@ import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 import {useVuelidate} from "@vuelidate/core";
 import {helpers, required} from "@vuelidate/validators"
-import { isFirstLetterCapital, isOnlyDigits, onlyChars } from "../../public/validation";
+import { isFirstLetterCapital, isOnlyDigits, onlyChars } from "../../../public/validation";
 const router = useRouter();
 const store = useStore();
 const selectedState = ref('Gujarat');

@@ -35,7 +35,7 @@ export class TicketDetailsController {
     res.status(HttpStatus.OK).json(result);
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Get('/getBookedTicketDetails')
   async getBookedTicketDetails(@Query('ticketId') ticketId: any) {
     console.log('ticketId ', ticketId);
@@ -52,7 +52,6 @@ export class TicketDetailsController {
   @UseGuards(JwtAuthGuard)
   @Post('/cancelBookedTicket')
   async cancelBookedTicket(@Body() payload: any) {
-    console.log('sdfsdfsdgtsdgrfgtdyhfgh', payload);
     return await this.ticketDetailsService.cancelBookedTicket(payload);
   }
 
@@ -104,11 +103,13 @@ export class TicketDetailsController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getAllCanceledTickets')
   async getAllCanceledTickets() {
     return await this.ticketDetailsService.getAllCanceledTickets();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getListOfCanceledTicketsByBusId')
   async getListOfCanceledTicketsByBusId(@Query('busId') busId: number) {
     return await this.ticketDetailsService.getListOfCanceledTicketsByBusId(

@@ -88,7 +88,7 @@ import { reactive,ref } from "vue";
 import {useRouter} from "vue-router";
 import {useStore} from "vuex";
 const store = useStore();
-import {onlyChars,isSpecialChar,isFirstLetterCapital,isPhoneNumber,isContainsChar,isContainsDigits} from '../../public/validation.js'
+import {onlyChars,isSpecialChar,isFirstLetterCapital,isPhoneNumber,isContainsChar,isContainsDigits} from '../../../public/validation';
 const router = useRouter()
 const userData = reactive({
   firstName: null,

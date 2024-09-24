@@ -13,8 +13,8 @@
         :disabled="isDisabled"
       ></v-text-field>
       <div class="d-flex flex-row justify-center align-center">
-        <v-btn variant="outlined" color="green" @click="send" v-if="!isDisabled"
-          >Send Otp</v-btn
+        <v-btn variant="outlined" color="green" @click="send" v-if="!isDisabled">
+          Send Otp</v-btn
         >
       </div>
       <div v-show="allowReset">
@@ -67,7 +67,7 @@
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
-import { axiosPost } from "../services/service";
+import { axiosPost } from "../../services/service";
 const allowReset = ref(false);
 const isDisabled = ref(false);
 const isShowPassword = ref(false);
@@ -115,6 +115,7 @@ const sendOtp = async () => {
   if (result.status == 200) {
     if (result.data == true) {
       allowReset.value = true;
+      isShowOtpModal.value=false;
     } else {
       isShowAlert.value = true;
       alertMsg.value = "Invalid Otp";

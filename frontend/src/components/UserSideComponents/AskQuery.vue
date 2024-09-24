@@ -41,7 +41,7 @@ const getLocalDateTime=(time)=>{
 }
 onMounted(async()=>{
    await store.dispatch("triggerGetMessages",{receiverId:2});
-    let pusher = new Pusher('5255d55b22b71ccf514f', { cluster: 'ap2' })
+    const pusher = new Pusher('5255d55b22b71ccf514f', { cluster: 'ap2' })
       pusher.subscribe('messages')
       pusher.bind('message_data', data => {
         console.log(data)

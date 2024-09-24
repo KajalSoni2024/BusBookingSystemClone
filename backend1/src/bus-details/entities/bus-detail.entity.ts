@@ -34,6 +34,9 @@ export class BusDetail {
   @Column()
   price: number;
 
+  @Column()
+  state: string;
+
   @OneToOne(
     () => User,
     (user) => {

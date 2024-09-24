@@ -3,7 +3,6 @@ import {axiosPost,axiosGet} from "../services/service";
 export default {
     async addBusDetail(payload){
         const result =  await axiosPost('/addBusDetails',payload)
-        console.log("SDFSDFSDFGSDGSDG",result.data);
         return result;
     },
 
@@ -27,13 +26,19 @@ export default {
     },
     async getAssignedBuses(){
         const result =  await axiosGet(`/getAssignedBuses`);
-        console.log(result.data)
-        return result;
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
     },
     async getBusDetailByBusName(payload){
         const result = await axiosGet(`/getBusDetailByBusName/?busName=${payload.busName}&busNo=${payload.busNo}`)
-        console.log(result.data);
-        return result;
+        if(result.status==200){
+            return result.data;
+        }else{
+            return result;
+        }
     }
   
 }

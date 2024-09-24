@@ -53,7 +53,7 @@ import {email, required, helpers, maxLength, minLength} from "@vuelidate/validat
 import { useRouter } from "vue-router";
 import { reactive, computed,ref } from "vue";
 import { useStore } from "vuex";
-import { isContainsChar, isContainsDigits, isSpecialChar } from "../../public/validation.js";
+import { isContainsChar, isContainsDigits, isSpecialChar } from "../../../public/validation.js";
 const store = useStore();
 const router = useRouter();
 const role = computed(()=>store.state.users.role);
@@ -87,7 +87,7 @@ if(!isValid){
   console.log(result);
   if(result.data!=false){
     if(role.value===1){
-    router.push({name:"AddBusDetail"})
+    router.push({path:"/dashboard"});
   }
   else if(role.value===2){
    router.push({name:"AllBuses"});

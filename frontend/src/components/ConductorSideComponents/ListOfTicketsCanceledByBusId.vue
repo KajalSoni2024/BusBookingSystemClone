@@ -4,11 +4,12 @@
    <div class="d-flex flex-row justify-center center align-center mt-5 ga-5"><v-text-field label="Enter Bus Name" v-model="busName"></v-text-field><v-text-field label="Enter Bus Number" v-model="busNo"></v-text-field></div>
   <div class="d-flex flex-row justify-center align-center"><v-btn variant="outlined" color="green" append-icon="mdi-search" @click="getBusId">Search</v-btn></div>
   </v-card></div>
-<div v-else class="d-flex flex-row justify-center align-center">
-<div><v-btn class="float-left" @click="isShowListOfCanceledTickets=false">Back</v-btn></div>
+<div v-else class="d-flex flex-column justify-center align-center">
+<div class="pa-5"><v-btn class="float-left" color="deep-orange-darken-1" @click="isShowListOfCanceledTickets=false">Back</v-btn></div>
 <div v-if="listOfCanceledTickets.length==0" >
   <p class="text-center text-red text-h5">No tickets has been canceled from this bus</p>
 </div>
+
 <v-card v-else width="1000px" class="pa-5 border-thin" :elevation="12" v-for="ticket in listOfCanceledTickets" :key="ticket.ticketId">
       <v-row>
         <v-col>
@@ -60,6 +61,7 @@
        </v-row>
       <p>ticket Id {{ ticket.ticketId }}</p>
     </v-card>
+    
     </div>
     <v-dialog v-model="isShowAlert" width="auto">
 <v-card width="800px" class="pa-5">

@@ -74,4 +74,16 @@ export class PaymentsController {
   async getTotalTicketsCancelledToday() {
     return await this.PaymentsService.getTotalTicketsCancelledToday();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getTotalTicketsCancelledPerMonth')
+  async getTotalTicketsCancelledPerMonth() {
+    return await this.PaymentsService.getTotalTicketsCancelledPerMonth();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getTotalCancelledTicketsWithPendingRefund')
+  async getTotalCancelledTicketsWithPendingRefund() {
+    return await this.PaymentsService.getTotalCancelledTicketsWithPendingRefund();
+  }
 }

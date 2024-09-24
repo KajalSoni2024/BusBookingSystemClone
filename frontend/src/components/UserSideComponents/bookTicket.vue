@@ -10,25 +10,25 @@
         color="deep-orange-darken-1"
         type="date"
         label="Date"
-        @blur="v$.ticketDate.$touch"
-        :error-messages="v$.ticketDate.$errors.map((e)=>e.$message)"
+        :min="minDate"
         v-model="ticketDate"
+       required
       ></v-text-field>
       <div class="border-thin ma-3 pa-3" v-for="passenger in passengerData" :key="passenger.id">
         <v-text-field
           label="Name"
           color="deep-orange-darken-1"
-          @blur="v$.name.$touch"
-          :error-messages="v$.name.$errors.map((e)=>e.$message)"
           v-model="passenger.name"
+            @blur="v$[passenger.id-1].name.$touch"
+            :error-messages="v$[passenger.id-1].name.$errors.map((e)=>e.$message)"
         ></v-text-field>
         <v-radio-group
           label="Gender"
           color="deep-orange-darken-1"
           v-model="passenger.gender"
           inline
-          @blur="v$.gender.$touch"
-          :error-messages="v$.gender.$errors.map((e)=>e.$message)"
+           @blur="v$[passenger.id-1].gender.$touch"
+           :error-messages="v$[passenger.id-1].gender.$errors.map((e)=>e.$message)"
         >
       <v-radio value="male" label="Male" ></v-radio>
       <v-radio value="female" label="Female"></v-radio>
@@ -38,8 +38,8 @@
           label="Age"
           color="deep-orange-darken-1"
           v-model="passenger.age"
-          @blur="v$.age.$touch"
-          :error-messages="v$.age.$errors.map((e)=>e.$message)"
+           @blur="v$[passenger.id-1].age.$touch"
+            :error-messages="v$[passenger.id-1].age.$errors.map((e)=>e.$message)"
         ></v-text-field>
       </div>
       <div>
@@ -83,7 +83,7 @@ import {useStore} from "vuex";
 import { ref, reactive, onMounted, computed} from "vue";
 import { axiosPost } from "@/services/service";
 import { loadStripe } from "@stripe/stripe-js";
-import { isFirstLetterCapital, isOnlyDigits, onlyChars } from "../../public/validation";
+import { isFirstLetterCapital, isOnlyDigits, onlyChars } from "../../../public/validation";
 const route = useRoute();
 const busId = ref(route.query.busId);
 const source = ref(route.query.source);
@@ -93,6 +93,7 @@ const total = ref(route.query.total);
 const stripe = ref(null);
 const ticketDate = ref(null);
 const store = useStore();
+const minDate = ref(null);
 const seatsDetails = computed(()=>{
   return store.state.users.busSeatsByBusId;
 });
@@ -111,15 +112,20 @@ const passengerData = reactive([
 ]);
 
 const rules = computed(()=>{
-  return {
+  const validationRule = passengerData.map((data)=>{
+    console.log(data);
+    return {
     name:{required, onlyChars:helpers.withMessage("Passenger's name should contain only characters",onlyChars),isFirstLetterCapital:helpers.withMessage("First letter of name should be capital",isFirstLetterCapital)},
     gender:{required},
     age:{required,isOnlyDigits:helpers.withMessage("Age should be only in numbers",isOnlyDigits)},
     ticketDate:{required}
   }
+  });
+  return validationRule;
 })
 
-const v$ = useVuelidate(rules,{ticketDate,...passengerData});
+const v$ = useVuelidate(rules,passengerData);
+
 function addPassenger() {
   const length = passengerData.length;
   if(length<total.value)
@@ -137,6 +143,8 @@ function removePassenger() {
 }
 
 async function pay() {
+  const isValid = await v$.value.$validate();
+  console.log(isValid);
   const selectedSeats = seatsWithSelectedOpt.value.filter((seat)=>seat.isSelected==true);
   if(selectedSeats.length!=total.value){
     alert(`Please select only ${total.value} seats`);
@@ -175,10 +183,13 @@ async function pay() {
   }
 }
 
+
  const selectSeat = (seat)=>{
   seat.isSelected = !seat.isSelected;
  }
  onMounted(async () => {
+  minDate.value = new Date().toISOString().slice(0,10);
+
   await store.dispatch("triggerGetBusSeatsByBusId",{busId:busId.value});
   stripe.value = await loadStripe(
     "pk_test_51PbaP8JlehMaIxjHdvmBnV8l6Xck9klkPSUuTuwlyXwT1sh2etRbmUT2dMjCbWbfuy24TdZhDIATHH0MyPj2ORZe00pM0fsWBY"

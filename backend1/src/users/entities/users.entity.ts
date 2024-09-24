@@ -31,7 +31,7 @@ export class User {
   gender: string;
 
   @Column()
-  contact: number;
+  contact: string;
 
   @Column()
   email: string;

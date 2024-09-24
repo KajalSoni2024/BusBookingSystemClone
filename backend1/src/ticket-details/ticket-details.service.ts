@@ -12,6 +12,7 @@ import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
 import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
 import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
 import { Cron } from '@nestjs/schedule';
+import { PusherService } from 'src/common/services/pusher.service';
 
 @Injectable()
 export class TicketDetailsService {
@@ -30,6 +31,7 @@ export class TicketDetailsService {
     private cancelTicketRequestRepo: Repository<CancelTicketRequest>,
     @InjectRepository(BusRoute)
     private BusRouteRepo: Repository<BusRoute>,
+    private pusherService: PusherService,
   ) {}
 
   async createTicket(data: any) {
@@ -39,6 +41,13 @@ export class TicketDetailsService {
         return result;
       },
     );
+    if (response) {
+      this.pusherService.triggerChannel(
+        'newTicketBooked',
+        'ticketData',
+        response,
+      );
+    }
     return response;
   }
 
@@ -68,8 +77,13 @@ export class TicketDetailsService {
       );
       const ticketDetails = await this.ticketDetailRepo.findOne({
         where: { ticketId: ticketId },
-        relations: { busDetail: true },
+        relations: {
+          busDetail: {
+            routes: true,
+          },
+        },
       });
+
       const passengerDetails = await this.PassengersRepo.createQueryBuilder(
         'passengers',
       )
@@ -135,7 +149,6 @@ export class TicketDetailsService {
         .where('ticketId=:ticketId', { ticketId: ticketId })
         .andWhere('otp=:otp', { otp: otp })
         .getOne();
-      console.log('sdfsdfgsdg', isOtpSame, otp);
       if (isOtpSame) {
         const cancelPayment = await this.PaymentsRepo.softDelete({
           paymentId: paymentId,
@@ -186,6 +199,12 @@ export class TicketDetailsService {
         const delTicket = await this.ticketDetailRepo.softDelete({
           ticketId: ticketId,
         });
+
+        this.pusherService.triggerChannel(
+          'ticketCancelled',
+          'isCancelled',
+          true,
+        );
         return true;
       } else {
         return false;
@@ -307,7 +326,8 @@ export class TicketDetailsService {
       .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
       .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
       .where('ticket.deletedAt is not null')
-      .andWhere('hasCancelled=:isCancelled', { isCancelled: false })
+      .andWhere('hasCancelled=:isCancelled', { isCancelled: true })
+      .orderBy('ticket.deletedAt', 'DESC')
       .getMany();
     console.log(result);
     return result;

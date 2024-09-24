@@ -8,7 +8,7 @@
             ><v-img
               max-height="180px"
               max-width="100px"
-              src="../../public/bus.jpg"
+              src="../../../public/bus.jpg"
             ></v-img
           ></v-col>
           <v-col md="6">
@@ -45,7 +45,7 @@
             </div>
             <div>
               <v-btn
-                varaint="outlined"
+                variant="outlined"
                 color="deep-orange-darken-1"
                 @click="showRoutes(bus.routes)"
                 >Route</v-btn

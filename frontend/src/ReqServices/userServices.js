@@ -39,7 +39,6 @@ async checkForgetPassOtp(payload){
 
  async getMessages(payload){
   const result = await axiosGet(`/messages/getMessages/?receiverId=${payload.receiverId}`);
-  console.log(result.data);
   return result;
  },
 

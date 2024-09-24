@@ -53,6 +53,7 @@ export class MessagesService {
         .andWhere('receiverId in (:...receivers)', {
           receivers: [senderId, receiverId],
         })
+        .orderBy('messageId', 'ASC')
         .getMany();
       console.log(result);
       return result;
@@ -85,10 +86,12 @@ export class MessagesService {
 
   async getChannelId(user1: number, user2: number) {
     try {
+      console.log('user1 :' + user1, 'user2 : ' + user2);
       const result = await this.ChannelsRepo.createQueryBuilder('channel')
         .where('user2_id in (:...userArr1)', { userArr1: [user1, user2] })
         .andWhere('user1_id in (:...userArr2)', { userArr2: [user1, user2] })
         .getOne();
+      console.log(result);
       return result;
     } catch (err) {
       console.log(err);

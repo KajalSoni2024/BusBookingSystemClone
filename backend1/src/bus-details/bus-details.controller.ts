@@ -131,4 +131,10 @@ export class BusDetailsController {
   async getTotalBuses() {
     return await this.busDetailsService.getTotalBuses();
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getTotalBusesPerState')
+  async getTotalBusesPerState() {
+    return await this.busDetailsService.getTotalBusesPerState();
+  }
 }

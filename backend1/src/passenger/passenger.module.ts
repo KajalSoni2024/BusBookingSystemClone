@@ -6,9 +6,11 @@ import { Passengers } from './entities/passenger.entity';
 import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
+import { CommonModule } from 'src/common/common.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Passengers, BusSeats, TicketDetail, BusDetail]),
+    CommonModule,
   ],
   controllers: [PassengerController],
   providers: [PassengerService],
