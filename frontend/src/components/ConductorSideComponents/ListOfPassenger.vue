@@ -21,7 +21,7 @@
         <td>{{ passenger.seatNo }}</td>
         <td>{{ passenger.source }}</td>
         <td>{{ passenger.destination }}</td>
-        <td><v-checkbox color="deep-orange-darken-1" v-model="passenger.hasTraveled"  @update:model-value="updateTraveledStatus(passenger)"></v-checkbox></td>
+        <td><v-checkbox color="deep-orange-darken-1" v-model="passenger.hasTraveled" :disabled="canCheckHasTraveledField"  @update:model-value="updateTraveledStatus(passenger)"></v-checkbox></td>
       </tr>
       </tbody>
     </v-table>
@@ -78,6 +78,14 @@ const updateTraveledStatus = async (passenger)=>{
 }
 
 const availableSeats = computed(()=>totalSeats.value-totalTicketsBooked.value);
+const canCheckHasTraveledField = computed(()=>{
+const currentDate = new Date().toLocaleString().split(",")[0].replaceAll("/","-");
+if(currentDate==date.value){
+  return false
+}else{
+  return true;
+}
+})
 onMounted(async () => {
   await store.dispatch("triggerGetPassengersList", {
     busId: busId.value,

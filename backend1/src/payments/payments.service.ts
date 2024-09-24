@@ -6,7 +6,7 @@ import { User } from 'src/users/entities/users.entity';
 import { TicketRefund } from './entities/ticketRefund.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { PusherService } from 'src/common/services/pusher.service';
-
+import { HttpStatus, HttpException } from '@nestjs/common';
 const stripe = require('stripe')(
   'sk_test_51PbaP8JlehMaIxjH8ih7mWf2DpABoFMv28R76jwGxh1XL8fxJeQtbDg56N2A7ycBzO7Egic5shOYNPYbfN5epBZS00AqT1ttlU',
 );
@@ -21,39 +21,52 @@ export class PaymentsService {
   ) {}
 
   async makePayment(paymentData: any, user: User) {
-    const userId: any = user.userId;
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: {
-              name: 'Ticket Amount',
+    try {
+      const userId: any = user.userId;
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price_data: {
+              currency: 'usd',
+              product_data: {
+                name: 'Ticket Amount',
+              },
+              unit_amount: paymentData.price * 100,
             },
-            unit_amount: paymentData.price * 100,
+            quantity: 1,
           },
-          quantity: 1,
+        ],
+        mode: 'payment',
+        success_url: `http://localhost:8080/ticketDetails/?ticketId=${paymentData.ticketId}`,
+        cancel_url: `http://localhost:8080/paymentFail/?ticketId=${paymentData.ticketId}`,
+      });
+
+      const result = await this.paymentRepo
+        .createQueryBuilder()
+        .insert()
+        .into(TicketPayment)
+        .values({
+          user: userId,
+          ticketDetail: paymentData.ticketId,
+          amount: paymentData.price,
+          sessionId: session.id,
+        })
+        .execute();
+      return { id: session.id, result: result };
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
         },
-      ],
-      mode: 'payment',
-      success_url: `http://localhost:8080/ticketDetails/?ticketId=${paymentData.ticketId}`,
-      cancel_url: `http://localhost:8080/paymentFail/?ticketId=${paymentData.ticketId}`,
-    });
-
-    const result = await this.paymentRepo
-      .createQueryBuilder()
-      .insert()
-      .into(TicketPayment)
-      .values({
-        user: userId,
-        ticketDetail: paymentData.ticketId,
-        amount: paymentData.price,
-        sessionId: session.id,
-      })
-      .execute();
-
-    return { id: session.id, result: result };
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   async payRefund(payload: any, user: any) {
@@ -97,6 +110,16 @@ export class PaymentsService {
       return { id: session.id, result: result };
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -115,6 +138,16 @@ export class PaymentsService {
         .execute();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -143,24 +176,48 @@ export class PaymentsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
   async getTotalTicketsCancelledPerMonth() {
     const currentYear = new Date().getFullYear();
     console.log(currentYear);
-    const result = await this.paymentRepo
-      .createQueryBuilder('payments')
-      .withDeleted()
-      .select('EXTRACT(MONTH FROM deletedAt) AS month, COUNT(*) AS count')
-      .where('deletedAt is not null')
-      .andWhere('EXTRACT(YEAR FROM deletedAt)=:currentYear', { currentYear })
-      .groupBy('month')
-      .orderBy('month')
-      .printSql()
-      .getRawMany();
-    console.log('getTotalTicketsCancelledPerMonth:=>', result);
-    return result;
+    try {
+      const result = await this.paymentRepo
+        .createQueryBuilder('payments')
+        .withDeleted()
+        .select('EXTRACT(MONTH FROM deletedAt) AS month, COUNT(*) AS count')
+        .where('deletedAt is not null')
+        .andWhere('EXTRACT(YEAR FROM deletedAt)=:currentYear', { currentYear })
+        .groupBy('month')
+        .orderBy('month')
+        .printSql()
+        .getRawMany();
+      console.log('getTotalTicketsCancelledPerMonth:=>', result);
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   async getTotalCancelledTicketsWithPendingRefund() {
@@ -193,7 +250,16 @@ export class PaymentsService {
       return count;
     } catch (err) {
       console.log(err);
-      throw err;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 }

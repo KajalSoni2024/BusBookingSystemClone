@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { BusSeats } from 'src/bus-details/entities/bus-seats.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { BusDetail } from 'src/bus-details/entities/bus-detail.entity';
+import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class PassengerService {
   constructor(
@@ -57,16 +58,29 @@ export class PassengerService {
   }
 
   async updateSeatNo(passengerId: number, seatNo: number) {
-    const response = await this.passengerRepo.manager.transaction(
-      async (entityManager) => {
-        return await entityManager.update(
-          Passengers,
-          { passengerId: passengerId },
-          { seatNo: seatNo },
-        );
-      },
-    );
-    return response;
+    try {
+      const response = await this.passengerRepo.manager.transaction(
+        async (entityManager) => {
+          return await entityManager.update(
+            Passengers,
+            { passengerId: passengerId },
+            { seatNo: seatNo },
+          );
+        },
+      );
+      return response;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   async updatePassengersTraveledStatus(query: any) {
@@ -85,6 +99,16 @@ export class PassengerService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -92,16 +116,28 @@ export class PassengerService {
     const currentDate = new Date();
     currentDate.setHours(0, 0, 0, 0);
     console.log('current date:=>' + currentDate);
-    const totalPassengers = await this.passengerRepo
-      .createQueryBuilder('passengers')
-      .withDeleted()
-      .leftJoinAndSelect('passengers.ticketDetails', 'ticketDetails')
-      .where('ticketDetails.ticketDate=:currentDate', {
-        currentDate: currentDate,
-      })
-      .getCount();
-
-    return totalPassengers;
+    try {
+      const totalPassengers = await this.passengerRepo
+        .createQueryBuilder('passengers')
+        .withDeleted()
+        .leftJoinAndSelect('passengers.ticketDetails', 'ticketDetails')
+        .where('ticketDetails.ticketDate=:currentDate', {
+          currentDate: currentDate,
+        })
+        .getCount();
+      return totalPassengers;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   async getPassengersTraveledPerMonth() {
@@ -122,7 +158,16 @@ export class PassengerService {
       console.log(result);
       return result;
     } catch (err) {
-      throw err;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 }

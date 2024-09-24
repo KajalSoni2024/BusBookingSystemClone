@@ -13,6 +13,7 @@ import { CancelTicketRequest } from './entities/cancel-ticket-req.entity';
 import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
 import { Cron } from '@nestjs/schedule';
 import { PusherService } from 'src/common/services/pusher.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @Injectable()
 export class TicketDetailsService {
@@ -35,20 +36,34 @@ export class TicketDetailsService {
   ) {}
 
   async createTicket(data: any) {
-    const response = await this.ticketDetailRepo.manager.transaction(
-      async (entityManager) => {
-        const result = await entityManager.save(TicketDetail, data);
-        return result;
-      },
-    );
-    if (response) {
-      this.pusherService.triggerChannel(
-        'newTicketBooked',
-        'ticketData',
-        response,
+    try {
+      const response = await this.ticketDetailRepo.manager.transaction(
+        async (entityManager) => {
+          const result = await entityManager.save(TicketDetail, data);
+          return result;
+        },
+      );
+      if (response) {
+        this.pusherService.triggerChannel(
+          'newTicketBooked',
+          'ticketData',
+          response,
+        );
+      }
+      return response;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
       );
     }
-    return response;
   }
 
   async getPassByTicketId(ticketId: number) {
@@ -64,6 +79,16 @@ export class TicketDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -95,6 +120,16 @@ export class TicketDetailsService {
       };
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -136,6 +171,16 @@ export class TicketDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -211,6 +256,16 @@ export class TicketDetailsService {
       }
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -224,6 +279,16 @@ export class TicketDetailsService {
         .getMany();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -255,6 +320,16 @@ export class TicketDetailsService {
         .getMany();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -295,6 +370,16 @@ export class TicketDetailsService {
       return passengerList;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -313,50 +398,103 @@ export class TicketDetailsService {
       }
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
   async getAllCanceledTickets() {
-    const result = await this.ticketDetailRepo
-      .createQueryBuilder('ticket')
-      .withDeleted()
-      .leftJoinAndSelect('ticket.user', 'user')
-      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
-      .leftJoinAndSelect('ticket.passengers', 'passengers')
-      .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
-      .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
-      .where('ticket.deletedAt is not null')
-      .andWhere('hasCancelled=:isCancelled', { isCancelled: true })
-      .orderBy('ticket.deletedAt', 'DESC')
-      .getMany();
-    console.log(result);
-    return result;
+    try {
+      const result = await this.ticketDetailRepo
+        .createQueryBuilder('ticket')
+        .withDeleted()
+        .leftJoinAndSelect('ticket.user', 'user')
+        .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+        .leftJoinAndSelect('ticket.passengers', 'passengers')
+        .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
+        .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
+        .where('ticket.deletedAt is not null')
+        .andWhere('hasCancelled=:isCancelled', { isCancelled: true })
+        .orderBy('ticket.deletedAt', 'DESC')
+        .getMany();
+      const cancelledTicketsWithoutRefund = result.filter((ticket) => {
+        return ticket.refundDetail == null ? true : false;
+      });
+      return cancelledTicketsWithoutRefund;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   async getTicketByTicketIdWithDeletedTrue(ticketId: any) {
-    return await this.ticketDetailRepo
-      .createQueryBuilder('ticket')
-      .withDeleted()
-      .leftJoinAndSelect('ticket.user', 'user')
-      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
-      .leftJoinAndSelect('ticket.passengers', 'passengers')
-      .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
-      .where('ticket.ticketId=:ticketId', { ticketId: ticketId })
-      .getOne();
+    try {
+      return await this.ticketDetailRepo
+        .createQueryBuilder('ticket')
+        .withDeleted()
+        .leftJoinAndSelect('ticket.user', 'user')
+        .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+        .leftJoinAndSelect('ticket.passengers', 'passengers')
+        .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
+        .where('ticket.ticketId=:ticketId', { ticketId: ticketId })
+        .getOne();
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   async getListOfCanceledTicketsByBusId(busId: any) {
-    return await this.ticketDetailRepo
-      .createQueryBuilder('ticket')
-      .withDeleted()
-      .leftJoinAndSelect('ticket.user', 'user')
-      .leftJoinAndSelect('ticket.busDetail', 'busDetail')
-      .leftJoinAndSelect('ticket.passengers', 'passengers')
-      .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
-      .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
-      .where('ticket.busDetail.busId=:busId', { busId: busId })
-      .andWhere('ticket.deletedAt is not null')
-      .getMany();
+    try {
+      return await this.ticketDetailRepo
+        .createQueryBuilder('ticket')
+        .withDeleted()
+        .leftJoinAndSelect('ticket.user', 'user')
+        .leftJoinAndSelect('ticket.busDetail', 'busDetail')
+        .leftJoinAndSelect('ticket.passengers', 'passengers')
+        .leftJoinAndSelect('ticket.paymentDetail', 'ticketPayments')
+        .leftJoinAndSelect('ticket.refundDetail', 'refundDetail')
+        .where('ticket.busDetail.busId=:busId', { busId: busId })
+        .andWhere('ticket.deletedAt is not null')
+        .getMany();
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
   }
 
   @Cron('* * * * *')

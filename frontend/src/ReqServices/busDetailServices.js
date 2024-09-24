@@ -39,6 +39,13 @@ export default {
         }else{
             return result;
         }
+    },
+
+    async addPassengers(payload){
+        const result = await axiosPost('/addPassengers',{ ticketId: payload.ticketId,
+            passengers: payload.passengers,
+            seats:payload.seats });
+            return result;
     }
   
 }

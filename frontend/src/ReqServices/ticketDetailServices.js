@@ -59,5 +59,10 @@ export default {
 
    async getListOfCanceledTicketsByBusId(payload){
     return await axiosGet(`/tickets/getListOfCanceledTicketsByBusId/?busId=${payload.busId}`)
+   },
+
+   async createTicket(payload){
+    console.log(payload);
+    return await axiosPost('/tickets/createTicket',payload)
    }
 }

@@ -106,7 +106,8 @@ async triggerGetUserById({commit},payload){
 async triggerGetAssignedBuses({commit}){
   console.log(commit);
   const result = await busDetailServices.getAssignedBuses();
-  commit("GET_ASSIGNED_BUSES",{data:result.data});
+  console.log("actions",result);
+  commit("GET_ASSIGNED_BUSES",{data:result});
 },
 async triggerGetPassengersList({commit},payload){
   console.log(commit);
@@ -163,5 +164,25 @@ async triggerGetAllMessagesByChannel(){
   const result = await userService.getAllMessagesByChannel();
   const channelList = result.data.filter((channel)=>channel.messages.length!=0?true:false);
   return channelList;
+}
+,
+
+async triggerCreateTicket({commit},payload){
+  console.log(commit);
+  const result  = await ticketDetailServices.createTicket(payload);
+  return result;
+},
+
+async triggerMakePayment({commit},payload){
+  console.log(commit);
+ const result = await ticketDetailServices.makePayment(payload);
+ return result;
+}
+,
+
+async triggerAddPassengers({commit},payload){
+  console.log(commit);
+  const result = await busDetailServices.addPassengers(payload);
+  return result;
 }
 };

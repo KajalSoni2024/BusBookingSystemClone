@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PusherService } from 'src/common/services/pusher.service';
 import { Channels } from './entities/channel.entity';
 import { channel } from 'diagnostics_channel';
+import { HttpStatus, HttpException } from '@nestjs/common';
 @Injectable()
 export class MessagesService {
   constructor(
@@ -40,6 +41,16 @@ export class MessagesService {
       return messageDetail;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -59,6 +70,16 @@ export class MessagesService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -72,6 +93,16 @@ export class MessagesService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -95,6 +126,16 @@ export class MessagesService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 }

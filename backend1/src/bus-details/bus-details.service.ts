@@ -9,7 +9,7 @@ import { ConductorDetail } from 'src/conductor-details/entities/conductor-detail
 import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
 import { identity } from 'rxjs';
 import { PusherService } from 'src/common/services/pusher.service';
-
+import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class BusDetailsService {
   constructor(
@@ -43,6 +43,16 @@ export class BusDetailsService {
       return busDetail;
     } catch (error) {
       console.log(error);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: error,
+        },
+      );
     }
   }
 
@@ -95,8 +105,17 @@ export class BusDetailsService {
         .from(BusDetail, 'busDetail')
         .where('busDetail.busId=:busId', { busId: busId })
         .getOne();
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: error,
+        },
+      );
     }
   }
 
@@ -110,6 +129,16 @@ export class BusDetailsService {
         .getOne();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -122,6 +151,16 @@ export class BusDetailsService {
       );
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -135,6 +174,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -147,6 +196,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -165,6 +224,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -181,6 +250,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -220,6 +299,16 @@ export class BusDetailsService {
       return true;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -234,6 +323,16 @@ export class BusDetailsService {
         .execute();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -277,6 +376,16 @@ export class BusDetailsService {
       return true;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -291,6 +400,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -307,6 +426,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
   async getBusDetailByBusName(query: any) {
@@ -319,13 +448,32 @@ export class BusDetailsService {
         .getOne();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
   async getTotalBuses() {
     try {
       return await this.busDetailRepo.createQueryBuilder().getCount();
     } catch (err) {
-      throw err;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -340,7 +488,16 @@ export class BusDetailsService {
       return result;
     } catch (err) {
       console.log(err);
-      throw err;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 }

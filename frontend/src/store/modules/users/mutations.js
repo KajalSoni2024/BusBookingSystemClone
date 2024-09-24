@@ -32,6 +32,7 @@ export const mutations = {
     state.busDetailsById=payload.data;
   },
   GET_ASSIGNED_BUSES(state,payload){
+    console.log("mutation ",payload);
     state.assignedBuses=payload.data;
   },
   GET_PASSENGERS_LIST(state,payload){

@@ -74,13 +74,19 @@
       </div>
     </v-card>
   </div>
+  <v-dialog v-model="showAlert" width="auto">
+<v-card width="600px" class="pa-5">
+  <div><v-icon class="float-right" color="red" @click="showAlert=false">mdi-close</v-icon></div>
+  <p class="text-center pa-5">You need to book ticket 1 hour before the bus arrives at station</p>
+</v-card>
+  </v-dialog>
 </template>
 <script setup>
 import {useVuelidate} from "@vuelidate/core";
 import {required,helpers} from "@vuelidate/validators";
 import { useRoute } from "vue-router";
 import {useStore} from "vuex";
-import { ref, reactive, onMounted, computed} from "vue";
+import { ref,watch, reactive, onMounted, computed} from "vue";
 import { axiosPost } from "@/services/service";
 import { loadStripe } from "@stripe/stripe-js";
 import { isFirstLetterCapital, isOnlyDigits, onlyChars } from "../../../public/validation";
@@ -94,12 +100,44 @@ const stripe = ref(null);
 const ticketDate = ref(null);
 const store = useStore();
 const minDate = ref(null);
+const showAlert = ref(false);
 const seatsDetails = computed(()=>{
   return store.state.users.busSeatsByBusId;
 });
 const seatsWithSelectedOpt= ref([])
 const halfSeat = computed(()=>{
   return seatsDetails.value.length/2;
+})
+const busDetails = computed(()=>{
+  return store.state.users.busDetailsById;
+})
+
+watch(ticketDate, ()=>{
+  try{
+    const currentTimeStamp = new Date();
+  const currentTime= currentTimeStamp.toLocaleString().split(",")[1];
+  let month = '';
+  if(currentTimeStamp.getMonth()<9){
+    month ='0'+(currentTimeStamp.getMonth()+1)
+  }else{
+    month=currentTimeStamp.getMonth()+1;
+  }
+  const todaysDate = `${currentTimeStamp.getFullYear()}-${month}-${currentTimeStamp.getDate()}`
+  console.log("currentDate "+todaysDate,"currentTime "+currentTime);
+  if(todaysDate == ticketDate.value){
+    const sourceDetail = busDetails.value?.routes?.filter((route)=>route.stopName==source.value?true:false);
+    console.log(sourceDetail);
+    const [hr,min,sec]=sourceDetail[0].arrivalTime.split(':');
+    console.log(min,sec);
+    if(parseInt(hr)<currentTimeStamp.getHours()){
+      ticketDate.value=""
+     showAlert.value=true
+    }
+  }
+  }catch(err){
+    console.log(err);
+
+  }
 })
 const passengerData = reactive([
   {
@@ -143,23 +181,24 @@ function removePassenger() {
 }
 
 async function pay() {
-  const isValid = await v$.value.$validate();
+  try{
+    const isValid = await v$.value.$validate();
   console.log(isValid);
   const selectedSeats = seatsWithSelectedOpt.value.filter((seat)=>seat.isSelected==true);
   if(selectedSeats.length!=total.value){
     alert(`Please select only ${total.value} seats`);
     return;
   }
-  const ticket = await axiosPost("/tickets/createTicket", {
+  const ticket = await store.dispatch("triggerCreateTicket",{
     source: source.value,
     destination: dest.value,
     ticketDate: ticketDate.value,
     busDetail: busId.value,
-  });
+  })
   console.log(ticket);
   if (ticket.status == 200) {
     const ticketId = ticket.data.ticketId;
-    const addPassResult = await axiosPost("/addPassengers", {
+    const addPassResult = await store.dispatch("triggerAddPassengers", {
       ticketId: ticketId,
       passengers: passengerData,
       seats:selectedSeats
@@ -181,15 +220,18 @@ async function pay() {
   if (error) {
     console.log(error.message);
   }
+  }catch(err){
+    console.log(err);
+  }
+  
 }
-
 
  const selectSeat = (seat)=>{
   seat.isSelected = !seat.isSelected;
  }
  onMounted(async () => {
   minDate.value = new Date().toISOString().slice(0,10);
-
+  
   await store.dispatch("triggerGetBusSeatsByBusId",{busId:busId.value});
   stripe.value = await loadStripe(
     "pk_test_51PbaP8JlehMaIxjHdvmBnV8l6Xck9klkPSUuTuwlyXwT1sh2etRbmUT2dMjCbWbfuy24TdZhDIATHH0MyPj2ORZe00pM0fsWBY"
@@ -197,8 +239,8 @@ async function pay() {
   seatsWithSelectedOpt.value = 
  seatsDetails.value.map((seat)=>{
    return {...seat, isSelected:false}
- })
-
+ });
+  await store.dispatch("triggerGetBusDetailsById",{busId:busId});
 
 });
 </script>

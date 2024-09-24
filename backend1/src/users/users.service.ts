@@ -7,6 +7,7 @@ import * as bcrypt from 'bcrypt';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { ForgetPassRequest } from './entities/forget-pass-req.entity';
 import { PusherService } from 'src/common/services/pusher.service';
+import { HttpException, HttpStatus } from '@nestjs/common';
 @Injectable()
 export class UsersService {
   constructor(
@@ -24,19 +25,32 @@ export class UsersService {
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
     userData.password = hash;
-    const response = await this.usersRepository.manager.transaction(
-      async (EntityManager) => {
-        return await EntityManager.save(User, userData);
-      },
-    );
-    if (response) {
-      this.pusherService.triggerChannel(
-        'newUserRegistered',
-        'userData',
-        response,
+    try {
+      const response = await this.usersRepository.manager.transaction(
+        async (EntityManager) => {
+          return await EntityManager.save(User, userData);
+        },
+      );
+      if (response) {
+        this.pusherService.triggerChannel(
+          'newUserRegistered',
+          'userData',
+          response,
+        );
+      }
+      return response;
+    } catch (err) {
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
       );
     }
-    return response;
   }
 
   async findByColumn(payload: any): Promise<any> {
@@ -44,6 +58,16 @@ export class UsersService {
       return await this.usersRepository.findOneBy(payload);
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -52,6 +76,16 @@ export class UsersService {
       return await this.usersRepository.findOneBy({ userId: userId });
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -60,6 +94,16 @@ export class UsersService {
       return await this.usersRepository.findOneBy({ email: email });
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -76,6 +120,16 @@ export class UsersService {
         .execute();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -87,6 +141,16 @@ export class UsersService {
       });
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -99,6 +163,16 @@ export class UsersService {
         .getMany();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -111,23 +185,47 @@ export class UsersService {
         .getMany();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
   async getOtpForForgetPassRequest(email: string) {
-    const user = await this.usersRepository.findOneBy({ email: email });
-    if (!user) {
-      return false;
-    } else {
-      const userId: any = user.userId;
-      const otp = 100000 + Math.floor(Math.random() * 900000);
-      const result = await this.forgetPassRequestRepo
-        .createQueryBuilder()
-        .insert()
-        .into(ForgetPassRequest)
-        .values({ user: userId, otp: otp })
-        .execute();
-      return otp.toString();
+    try {
+      const user = await this.usersRepository.findOneBy({ email: email });
+      if (!user) {
+        return false;
+      } else {
+        const userId: any = user.userId;
+        const otp = 100000 + Math.floor(Math.random() * 900000);
+        const result = await this.forgetPassRequestRepo
+          .createQueryBuilder()
+          .insert()
+          .into(ForgetPassRequest)
+          .values({ user: userId, otp: otp })
+          .execute();
+        return otp.toString();
+      }
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -148,6 +246,16 @@ export class UsersService {
       }
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -161,6 +269,16 @@ export class UsersService {
         .execute();
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 
@@ -169,7 +287,16 @@ export class UsersService {
       return await this.usersRepository.createQueryBuilder('users').getCount();
     } catch (err) {
       console.log(err);
-      throw err;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
   async getUsersRegisteredPerMonth() {
@@ -190,6 +317,16 @@ export class UsersService {
       return users;
     } catch (err) {
       console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
   async getRecentlyRegisteredUser() {
@@ -220,7 +357,16 @@ export class UsersService {
       console.log(users);
       return users;
     } catch (err) {
-      throw err;
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
     }
   }
 }

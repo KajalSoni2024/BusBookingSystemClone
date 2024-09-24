@@ -131,7 +131,7 @@ router.push({name:"ListOfPassengers",query:{date:journeyDate.value,busId:busId.v
 }
 onMounted(async ()=>{
 await store.dispatch("triggerGetAssignedBuses");
-console.log(assignedBuses.value);
+console.log("assignedBuses",assignedBuses.value);
 })
 </script>
 <style scoped></style>
