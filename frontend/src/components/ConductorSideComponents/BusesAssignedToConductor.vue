@@ -1,17 +1,17 @@
 <template>
 <div class="d-flex flex-column justify-center align-center pa-5" v-if="assignedBuses?.length>0">
-<v-card class="pa-5" width="1000px" v-for="bus in assignedBuses" :key="bus.busId">
+<v-card class="pa-5" width="1000px" v-for="bus in assignedBuses" :key="bus?.busId">
   <v-row>
     <v-col>
         <div class="d-flex flex-column">
             <p class="text-h6 text-deep-orange-darken-1"><b>Bus Name</b></p>
-            <p class="text-green">{{ bus.busName }}</p>
+            <p class="text-green">{{ bus?.busName }}</p>
         </div>
     </v-col>
     <v-col>
         <div class="d-flex flex-column">
             <p class="text-h6 text-deep-orange-darken-1"><b>Bus Number</b></p>
-            <p class="text-green">{{ bus.busNo }}</p>
+            <p class="text-green">{{ bus?.busNo }}</p>
         </div>    
     </v-col>
   </v-row>
@@ -19,13 +19,13 @@
     <v-col>
         <div class="d-flex flex-column">
             <p class="text-h6 text-deep-orange-darken-1"><b>Total Seats</b></p>
-            <p class="text-green">{{ bus.totalSeats }}</p>
+            <p class="text-green">{{ bus?.totalSeats }}</p>
         </div> 
     </v-col>
     <v-col>
         <div class="d-flex flex-column">
             <p class="text-h6 text-deep-orange-darken-1"><b>Price</b></p>
-            <p class="text-green">{{ bus.price }}</p>
+            <p class="text-green">{{ bus?.price }}</p>
         </div> 
     </v-col>
   </v-row>
@@ -35,11 +35,11 @@
         <div class="d-flex flex-row ga-5">
         <div class="d-flex flex-column ga-2"> 
             <p class="text-h6 text-deep-orange-darken-1"><b>Name</b></p>
-            <p class="text-green">{{ bus.driver.firstName}} {{ bus.driver.lastName }}</p>
+            <p class="text-green">{{ bus?.driver?.firstName}} {{ bus?.driver?.lastName }}</p>
         </div>
         <div  class="d-flex flex-column ga-2"> 
          <p class="text-h6 text-deep-orange-darken-1"><b>Contact</b></p>
-         <p class="text-green">{{ bus.driver.contact }}</p>
+         <p class="text-green">{{ bus?.driver?.contact }}</p>
         </div>
         </div>
     </v-col>
@@ -48,11 +48,11 @@
         <div class="d-flex flex-row ga-5">
         <div class="d-flex flex-column ga-2"> 
             <p class="text-h6 text-deep-orange-darken-1"><b>Name</b></p>
-            <p class="text-green">{{ bus.conductor.firstName}} {{ bus.conductor.lastName }}</p>
+            <p class="text-green">{{ bus?.conductor?.firstName}} {{ bus?.conductor?.lastName }}</p>
         </div>
         <div  class="d-flex flex-column ga-2"> 
          <p class="text-h6 text-deep-orange-darken-1"><b>Contact</b></p>
-         <p class="text-green">{{ bus.conductor.contact }}</p>
+         <p class="text-green">{{ bus?.conductor?.contact }}</p>
         </div>
         </div>
     </v-col>
@@ -60,7 +60,7 @@
   <v-row>
     <v-col></v-col>
     <v-col> <div>
-    <div class="d-flex flex-row ga-5 align-center"><v-btn variant="outlined" color="deep-orange-darken-1" @click="showDateSelectModal(bus.busId)">Show Passenger List</v-btn><v-btn variant="outlined" color="green" @click="showRoute(bus.routes)">Show Route</v-btn></div>
+    <div class="d-flex flex-row ga-5 align-center"><v-btn v-if="bus" variant="outlined" color="deep-orange-darken-1" @click="showDateSelectModal(bus.busId)">Show Passenger List</v-btn><v-btn variant="outlined" color="green" @click="showRoute(bus.routes)">Show Route</v-btn></div>
   </div></v-col>
   </v-row>
  
@@ -88,15 +88,15 @@
           <div
             class="d-flex flex-row align-center ga-5 pa-5"
             v-for="route in busRoutes"
-            :key="route.routeId"
+            :key="route?.routeId"
           >
           <div class="d-flex flex-column justify-start">
             <div class="d-flex flex-row align-center">
             <v-icon size="50" color="deep-orange-darken-1">mdi-bus-stop</v-icon>
-            <p class="text-h5 text-green">{{ route.stopName }}</p>
+            <p class="text-h5 text-green">{{ route?.stopName }}</p>
           </div>
-         <div class="d-flex flex-row pl-2 ga-5">      <p><b>Arrival: </b>{{ route.arrivalTime }}</p>
-            <p><b>Departure: </b>{{ route.departTime }}</p></div>
+         <div class="d-flex flex-row pl-2 ga-5">      <p><b>Arrival: </b>{{ route?.arrivalTime }}</p>
+            <p><b>Departure: </b>{{ route?.departTime }}</p></div>
           </div>
           </div>
         </v-card>

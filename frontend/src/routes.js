@@ -139,6 +139,20 @@ const routes = [
     name:"ErrorPage",
     component:()=>import("./components/GeneralComponents/ErrorPage.vue"),
     path:"/errorPage"
+  },{
+    name:"UserProfile",
+    component:()=>import("./components/UserSideComponents/UserProfile.vue"),
+    path:"/userProfile"
+  },
+ {
+  name:"AdminProfile",
+  component:()=>import("./components/adminSideComponents/AdminProfile.vue"),
+  path:"/adminProfile"
+ },
+  {
+    name:"ConductorProfile",
+    component:()=>import("./components/ConductorSideComponents/ConductorProfile"),
+    path:"/conductorProfile"
   }
 ];
 

@@ -117,7 +117,7 @@ const addRoutesDetails = async ()=>{
 }
 
 watchEffect(async ()=>{
- const result = await store.dispatch("triggerGetCitiesByState",{state:busDetail.state});
+ const result = await store.dispatch("triggerGetCitiesByState",{state:busDetail?.state});
    cities.value = result;
    console.log(cities.value);
 },{deep:true});

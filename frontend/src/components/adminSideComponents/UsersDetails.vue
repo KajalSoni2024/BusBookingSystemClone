@@ -23,14 +23,14 @@
     <tbody>
       <tr
         v-for="user in users"
-        :key="user.userId"
+        :key="user?.userId"
       >
-        <td>{{ user.firstName }} {{ user.lastName }}</td>
-        <td>{{ user.email }}</td>
-        <td>{{ user.gender }}</td>
-        <td>{{ user.contact }}</td>
-        <td>{{ getLocalDataTime(user.createdAt) }}</td>
-        <td><v-btn @click="viewAllTicketsBookedByUser(user.userId,user.tickets.length)">View</v-btn></td>
+        <td>{{ user?.firstName }} {{ user?.lastName }}</td>
+        <td>{{ user?.email }}</td>
+        <td>{{ user?.gender }}</td>
+        <td>{{ user?.contact }}</td>
+        <td v-if="user?.createdAt">{{ getLocalDataTime(user.createdAt) }}</td>
+        <td v-if="user"><v-btn @click="viewAllTicketsBookedByUser(user?.userId,user?.tickets?.length)">View</v-btn></td>
       </tr>
     </tbody>
   </v-table>

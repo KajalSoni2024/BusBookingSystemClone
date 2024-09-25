@@ -25,7 +25,14 @@
           <v-icon>mdi-help-circle-outline</v-icon>
           Ask Your Query
         </v-btn>
+        <v-btn to="/userProfile"> 
+          <v-icon>
+            mdi-account
+          </v-icon>
+          My Profile
+        </v-btn>
       </template>
+
       <template v-if="role == 1">
         <v-btn to="/dashboard">
           <v-icon>mdi-view-dashboard</v-icon>
@@ -65,6 +72,10 @@
           </v-icon>
           List Of Users Query
         </v-btn>
+        <v-btn>
+          <v-icon>mdi-account</v-icon>
+          My Profile
+        </v-btn>
       </template>
       <template v-if="role==3">
         <v-btn to="/buses">
@@ -78,6 +89,10 @@
      <v-btn class="text-center" to="/listOfCanceledTicketsByBusId">
       <v-icon>mdi-list-status</v-icon>
       List Of Canceled Tickets
+     </v-btn>
+     <v-btn>
+      <v-icon>mdi-account</v-icon>
+      My Profile
      </v-btn>
       </template>
     </v-bottom-navigation>

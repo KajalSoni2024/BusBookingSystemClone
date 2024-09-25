@@ -1,12 +1,12 @@
 <template>
     <template v-if="bookedTickets && bookedTickets?.length>0">
-        <div v-for="ticket in bookedTickets" :key="ticket.paymentId" class="d-flex flex-column align-center mt-5">
+        <div v-for="ticket in bookedTickets" :key="ticket?.paymentId" class="d-flex flex-column align-center mt-5">
     <v-card width="1000px" class="pa-2">
         <v-row><v-col>Bus Name</v-col><v-col>{{ticket?.ticketWithPassenger?.busDetail?.busName }}</v-col></v-row>
-        <v-row><v-col>Source</v-col><v-col>{{ ticket.ticketDetail.source }}</v-col></v-row>
-        <v-row><v-col>Destination</v-col><v-col>{{ ticket.ticketDetail.destination }}</v-col></v-row>
-        <v-row><v-col>Journey Date</v-col><v-col>{{ getLocalDateTime(ticket.ticketDetail.ticketDate) }}</v-col></v-row>
-        <div class="d-flex flex-row ga-2 mt-2">
+        <v-row><v-col>Source</v-col><v-col>{{ ticket?.ticketDetail?.source }}</v-col></v-row>
+        <v-row><v-col>Destination</v-col><v-col>{{ ticket?.ticketDetail?.destination }}</v-col></v-row>
+        <v-row><v-col>Journey Date</v-col><v-col v-if="ticket">{{ getLocalDateTime(ticket?.ticketDetail?.ticketDate) }}</v-col></v-row>
+        <div v-if="ticket" class="d-flex flex-row ga-2 mt-2">
             <v-btn color="deep-orange-darken-2" variant="outlined" @click="viewTicket(ticket.ticketDetail.ticketId)">View Ticket</v-btn>
             <v-btn color="deep-orange-darken-2
 " @click="showConfirmationModal(ticket)">Cancel Ticket</v-btn></div>
@@ -21,10 +21,10 @@
 <v-card width="1000px" class="pa-5">
     <div><v-icon class="float-right" color="red " @click="isViewTicket=false">mdi-close</v-icon></div>
     <div class="d-flex flex-column ga-5 pl-5">
-    <p><b>Bus Name:-  </b><span class="text-deep-orange-darken-2">{{ ticketDetails[0].ticketWithPassenger.busDetail.busName }}</span></p>
-    <p><b>Bus Number:-  </b><span>{{ ticketDetails[0].ticketWithPassenger.busDetail.busNo }}</span></p>
-    <p><b>Source:-  </b><span class="text-green">{{ ticketDetails[0].ticketWithPassenger.source }}</span></p>
-    <p><b>Destination:-  </b><span class="text-green">{{ ticketDetails[0].ticketWithPassenger.destination }}</span></p>
+    <p><b>Bus Name:-  </b><span class="text-deep-orange-darken-2">{{ ticketDetails[0]?.ticketWithPassenger?.busDetail?.busName }}</span></p>
+    <p><b>Bus Number:-  </b><span>{{ ticketDetails[0]?.ticketWithPassenger?.busDetail?.busNo }}</span></p>
+    <p><b>Source:-  </b><span class="text-green">{{ ticketDetails[0]?.ticketWithPassenger?.source }}</span></p>
+    <p><b>Destination:-  </b><span class="text-green">{{ ticketDetails[0]?.ticketWithPassenger?.destination }}</span></p>
     </div>
     <v-card-item>
 <div>
@@ -34,11 +34,11 @@
        <v-col><b>Passenger Age</b></v-col>
        <v-col><b>Seat Number</b></v-col>
     </v-row>
-    <v-row v-for="passenger in ticketDetails[0]?.ticketWithPassenger?.passengers" :key="passenger.seatNumber">
-<v-col>{{ passenger.passengerName }}</v-col>
-<v-col>{{ passenger.passengerGender }}</v-col>
-<v-col>{{ passenger.passengerAge }}</v-col>
-<v-col>{{ passenger.seatNo}}</v-col>
+    <v-row v-for="passenger in ticketDetails[0]?.ticketWithPassenger?.passengers" :key="passenger?.seatNumber">
+<v-col>{{ passenger?.passengerName }}</v-col>
+<v-col>{{ passenger?.passengerGender }}</v-col>
+<v-col>{{ passenger?.passengerAge }}</v-col>
+<v-col>{{ passenger?.seatNo}}</v-col>
     </v-row>
 </div>
 </v-card-item>
@@ -47,7 +47,13 @@
 <v-dialog v-model="isShowOtpModal" width="auto">
     <v-card class="pa-5" width="600px">
         <div><v-icon class="float-right" @click="isShowOtpModal=false">mdi-close</v-icon></div>
-        <v-text-field label="Enter OTP" v-model="otp" color="deep-orange-darken-2" @keyup.enter="cancelTicket" ></v-text-field>
+        <div class="d-flex flex-row justify-center align-center">
+            <p class="text-primary">Enter Otp</p>
+            <v-otp-input length="6" v-model="otp"></v-otp-input>
+            <p v-if="timeLimit>=10" class="text-primary">Otp Will be Expired in 00:{{ timeLimit }}</p>
+            <p v-else class="text-primary">Otp Will be Expired in 00:0{{ timeLimit }}</p>
+            <div class="d-flex flex-row justify-center align-center "><v-btn @click="cancelTicket"></v-btn></div>
+        </div>
     </v-card>
 </v-dialog>
 <v-dialog v-model="isShowConfirmationModal" width="auto">
@@ -78,7 +84,7 @@
 </v-dialog>
 </template>
 <script setup>
-import { onMounted , computed, ref} from "vue";
+import { onMounted , computed, watch, ref} from "vue";
 import {useStore} from "vuex";
 const store  = useStore();
 const isViewTicket = ref(false);
@@ -90,6 +96,7 @@ const otp = ref(null);
 const ticketToBeCanceled = ref({});
 const alertMsg = ref(null);
 const isDanger=ref(false);
+const timeLimit = ref(60);
 const bookedTickets = computed(()=>{
     return store.state.users.bookedTickets;
 });
@@ -135,6 +142,19 @@ const generateOtp = async  ()=>{
     }
 }
 
+watch(isShowOtpModal,()=>{
+if(isShowOtpModal.value){
+  timeLimit.value=60;
+  setInterval(()=>{
+    if(timeLimit.value>0){
+      timeLimit.value--;
+    }
+  },1000);
+  if(timeLimit.value==0){
+    isShowOtpModal.value=false;
+  }
+}
+})
 const getLocalDateTime = (date)=>{
 const newDate = new Date(date);
 return newDate.toLocaleString();

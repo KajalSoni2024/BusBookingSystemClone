@@ -9,6 +9,11 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
+import { UseInterceptors, UploadedFile } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
+import { Cron } from '@nestjs/schedule';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.gaurd';
 import { EmailerService } from 'src/emailer/emailer.service';
@@ -107,5 +112,39 @@ export class UserController {
   @Get('/getRecentlyRegisteredUser')
   async getRecentlyRegisteredUser() {
     return await this.userService.getRecentlyRegisteredUser();
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getLoggedInUserDetail')
+  async getLoggedInUserDetail(@Request() req: any) {
+    const user = req.user;
+    return await this.userService.getLoggedInUserDetail(user.userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/updateUserDetails')
+  async updateUserDetails(@Body() userData: any) {
+    return await this.userService.updateUserDetails(userData);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/uploadUserImg')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join('');
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async upload(@Request() req: any, @UploadedFile() file: any) {
+    const user = req.user;
+    return await this.userService.uploadUserImg(user, file);
   }
 }

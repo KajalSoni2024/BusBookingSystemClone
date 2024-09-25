@@ -14,14 +14,14 @@
         </tr>
       </thead>
       <tbody>
-      <tr v-for="passenger in passengersList" :key="passenger.passengerId">
-        <td>{{ passenger.passengerName }}</td>
-        <td>{{ passenger.passengerGender }}</td>
-        <td>{{ passenger.passengerAge }}</td>
-        <td>{{ passenger.seatNo }}</td>
-        <td>{{ passenger.source }}</td>
-        <td>{{ passenger.destination }}</td>
-        <td><v-checkbox color="deep-orange-darken-1" v-model="passenger.hasTraveled" :disabled="canCheckHasTraveledField"  @update:model-value="updateTraveledStatus(passenger)"></v-checkbox></td>
+      <tr v-for="passenger in passengersList" :key="passenger?.passengerId">
+        <td>{{ passenger?.passengerName }}</td>
+        <td>{{ passenger?.passengerGender }}</td>
+        <td>{{ passenger?.passengerAge }}</td>
+        <td>{{ passenger?.seatNo }}</td>
+        <td>{{ passenger?.source }}</td>
+        <td>{{ passenger?.destination }}</td>
+        <td><v-checkbox color="deep-orange-darken-1" v-if="passenger" v-model="passenger.hasTraveled" :disabled="canCheckHasTraveledField"  @update:model-value="updateTraveledStatus(passenger)"></v-checkbox></td>
       </tr>
       </tbody>
     </v-table>

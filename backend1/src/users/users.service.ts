@@ -8,6 +8,7 @@ import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { ForgetPassRequest } from './entities/forget-pass-req.entity';
 import { PusherService } from 'src/common/services/pusher.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Cron } from '@nestjs/schedule';
 @Injectable()
 export class UsersService {
   constructor(
@@ -368,5 +369,110 @@ export class UsersService {
         },
       );
     }
+  }
+
+  async getLoggedInUserDetail(userId: any) {
+    try {
+      const result = await this.usersRepository.findOne({
+        where: { userId: userId },
+        relations: {
+          busAssignedToConductor: true,
+          busAssignedToDriver: true,
+          refundDetails: true,
+          tickets: { busDetail: true, passengers: true },
+          payments: true,
+        },
+      });
+      console.log(result);
+      const { password, ...userData } = result;
+      console.log(password);
+      return userData;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
+  }
+
+  async updateUserDetails(userData: any) {
+    try {
+      console.log(userData);
+      const { userId, firstName, lastName, email, contact } = userData;
+      const result = await this.usersRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({ firstName, lastName, email, contact })
+        .where('userId=:userId', { userId })
+        .execute();
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
+  }
+
+  async uploadUserImg(user, image) {
+    const { userId } = user;
+    try {
+      const result = await this.usersRepository
+        .createQueryBuilder()
+        .update(User)
+        .set({ image: image.filename })
+        .where('userId=:userId', { userId })
+        .execute();
+      console.log(result);
+      return result;
+    } catch (err) {
+      console.log(err);
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: 'Something unexpected happened',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+        {
+          cause: err,
+        },
+      );
+    }
+  }
+
+  @Cron('* * * * *')
+  async delExpiredOtpsForForgetPass() {
+    const currentDate = new Date();
+    const startOfToday = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endOfToday = new Date(currentDate.setHours(23, 59, 59, 999));
+
+    const result = await this.forgetPassRequestRepo
+      .createQueryBuilder('ForgetPassRequest')
+      .softDelete()
+      .where('createdAt BETWEEN :startOfToday AND :endOfToday', {
+        startOfToday,
+        endOfToday,
+      })
+      .andWhere('EXTRACT(MINUTE FROM createdAt) <= :currentMinute - :minDiff', {
+        currentMinute: currentDate.getMinutes(),
+        minDiff: 1,
+      })
+      .printSql()
+      .execute();
+    console.log(result);
   }
 }

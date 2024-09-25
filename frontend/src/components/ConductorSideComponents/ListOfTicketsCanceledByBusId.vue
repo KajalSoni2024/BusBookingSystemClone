@@ -10,17 +10,17 @@
   <p class="text-center text-red text-h5">No tickets has been canceled from this bus</p>
 </div>
 
-<v-card v-else width="1000px" class="pa-5 border-thin" :elevation="12" v-for="ticket in listOfCanceledTickets" :key="ticket.ticketId">
+<v-card v-else width="1000px" class="pa-5 border-thin" :elevation="12" v-for="ticket in listOfCanceledTickets" :key="ticket?.ticketId">
       <v-row>
         <v-col>
             <v-row>
             <v-col class="text-deep-orange-darken-1" >Name Of Registered User :-</v-col>
-            <v-col>{{ ticket.user.firstName }} {{ ticket.user.lastName }}</v-col>
+            <v-col>{{ ticket?.user?.firstName }} {{ ticket?.user?.lastName }}</v-col>
         </v-row>
         </v-col>
         <v-col>
         <v-row><v-col class="text-deep-orange-darken-1">Email :-</v-col>
-        <v-col>{{ ticket.user.email }}</v-col>
+        <v-col>{{ ticket?.user?.email }}</v-col>
         </v-row>
         </v-col>
       </v-row>
@@ -28,13 +28,13 @@
         <v-col>
             <v-row>
             <v-col class="text-deep-orange-darken-1">Journey Date :-</v-col>
-            <v-col>{{ ticket.ticketDate }}</v-col>
+            <v-col>{{ ticket?.ticketDate }}</v-col>
         </v-row>
         </v-col>
         <v-col>
             <v-row>
             <v-col class="text-deep-orange-darken-1">Booking Date :-</v-col>
-            <v-col>{{ ticket.bookedAt }}</v-col>
+            <v-col>{{ ticket?.bookedAt }}</v-col>
         </v-row>
         </v-col>
       </v-row>
@@ -42,24 +42,24 @@
         <v-col> 
             <v-row>
             <v-col class="text-deep-orange-darken-1">Source :-</v-col>
-            <v-col>{{ ticket.source }}</v-col>
+            <v-col>{{ ticket?.source }}</v-col>
         </v-row></v-col>
         <v-col>  <v-row>
             <v-col class="text-deep-orange-darken-1">Destination :-</v-col>
-            <v-col>{{ ticket.destination }}</v-col>
+            <v-col>{{ ticket?.destination }}</v-col>
         </v-row></v-col>
        </v-row>
        <v-row>
         <v-col>
           <v-row>
             <v-col class="text-deep-orange-darken-1">Total Passengers :-</v-col>
-            <v-col>{{ ticket.passengers.length }}</v-col>
+            <v-col>{{ ticket?.passengers?.length }}</v-col>
         </v-row>
         </v-col>
         <v-col>
         </v-col>
        </v-row>
-      <p>ticket Id {{ ticket.ticketId }}</p>
+      <p>ticket Id {{ ticket?.ticketId }}</p>
     </v-card>
     
     </div>

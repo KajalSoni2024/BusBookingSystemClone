@@ -14,36 +14,36 @@
           <v-col md="6">
             <div class="pa-3">
               <p class="text-h5">{{ bus.busName }}</p>
-              <template v-for="route in bus.routes" :key="route.routeId">
-                <div v-if="route.stopName == source">
+              <template v-for="route in bus?.routes" :key="route?.routeId">
+                <div v-if="route?.stopName == source">
                   <p class="text-deep-orange-darken-1 text-h6">
-                    {{ route.stopName }}
+                    {{ route?.stopName }}
                   </p>
                   <div class="d-flex flex-row ga-8">
                     <div>
                       <p>Arrival Time</p>
-                      <p class="text-green">{{ route.arrivalTime }}</p>
+                      <p class="text-green">{{ route?.arrivalTime }}</p>
                     </div>
                     <div>
                       <p>Departure Time</p>
-                      <p class="text-green">{{ route.departTime }}</p>
+                      <p class="text-green">{{ route?.departTime }}</p>
                     </div>
                   </div>
                 </div>
               </template>
-              <template v-for="route in bus.routes" :key="route.routeId">
-                <div v-if="route.stopName == dest">
+              <template v-for="route in bus?.routes" :key="route?.routeId">
+                <div v-if="route?.stopName == dest">
                   <p class="text-deep-orange-darken-1 text-h6">
-                    {{ route.stopName }}
+                    {{ route?.stopName }}
                   </p>
                   <div class="d-flex flex-row ga-8">
                     <div>
                       <p>Arrival Time</p>
-                      <p class="text-green">{{ route.arrivalTime }}</p>
+                      <p class="text-green">{{ route?.arrivalTime }}</p>
                     </div>
                     <div>
                       <p>Departure Time</p>
-                      <p class="text-green">{{ route.departTime }}</p>
+                      <p class="text-green">{{ route?.departTime }}</p>
                     </div>
                   </div>
                 </div>
@@ -61,13 +61,13 @@
               <p>
                 <span class="text-deep-orange-darken-1 text-h6"
                   >Available Seats : </span
-                ><span class="text-green">{{ bus.availableSeats }}</span>
+                ><span class="text-green">{{ bus?.availableSeats }}</span>
               </p>
             </div>
             <div>
               <p>
                 <span class="text-deep-orange-darken-1 text-h6">Price : </span
-                ><span class="text-green">{{ bus.price }}</span>
+                ><span class="text-green">{{ bus?.price }}</span>
               </p>
             </div>
             <div>
@@ -90,10 +90,10 @@
           <div
             class="d-flex flex-row align-center ga-5 pa-5"
             v-for="route in busRoutes"
-            :key="route.routeId"
+            :key="route?.routeId"
           >
             <v-icon size="50" color="deep-orange-darken-1">mdi-bus-stop</v-icon>
-            <p class="text-h5 text-green">{{ route.stopName }}</p>
+            <p class="text-h5 text-green">{{ route?.stopName }}</p>
           </div>
         </v-card>
       </v-dialog>

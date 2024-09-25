@@ -31,11 +31,11 @@
         </v-row>
         <v-row>
             <v-col><h2>Booked At</h2></v-col>
-            <v-col>{{ getDateTime(details?.ticketDetails?.bookedAt) }}</v-col>
+            <v-col v-if="details?.ticketDetails?.bookedAt">{{ getDateTime(details?.ticketDetails?.bookedAt) }}</v-col>
         </v-row>
         <v-row>
             <v-col><h2>Journey Date</h2></v-col>
-            <v-col>{{ getDateTime(details?.ticketDetails?.ticketDate) }}</v-col>
+            <v-col v-if="details?.ticketDetails?.ticketDate">{{ getDateTime(details?.ticketDetails?.ticketDate) }}</v-col>
         </v-row>
 </v-card-item>
 <v-divider></v-divider>
@@ -47,11 +47,11 @@
        <v-col><b>Passenger Age</b></v-col>
        <v-col><b>Seat Number</b></v-col>
     </v-row>
-    <v-row v-for="passenger in details?.passengerDetails" :key="passenger.seatNumber">
-<v-col>{{ passenger.passengerName }}</v-col>
-<v-col>{{ passenger.passengerGender }}</v-col>
-<v-col>{{ passenger.passengerAge }}</v-col>
-<v-col>{{ passenger.seatNo}}</v-col>
+    <v-row v-for="passenger in details?.passengerDetails" :key="passenger?.seatNumber">
+<v-col>{{ passenger?.passengerName }}</v-col>
+<v-col>{{ passenger?.passengerGender }}</v-col>
+<v-col>{{ passenger?.passengerAge }}</v-col>
+<v-col>{{ passenger?.seatNo}}</v-col>
     </v-row>
 </div>
 </v-card-item>

@@ -42,6 +42,9 @@ export class User {
   @Column({ default: false })
   isAssigned: boolean;
 
+  @Column({ default: null })
+  image: string;
+
   @OneToOne(() => BusDetail, (bus) => bus.conductor)
   busAssignedToConductor: BusDetail;
 

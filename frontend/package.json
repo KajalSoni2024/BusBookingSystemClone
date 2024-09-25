@@ -18,6 +18,7 @@
     "echarts": "^5.5.1",
     "element-plus": "^2.8.1",
     "html2pdf.js": "^0.10.2",
+    "multer": "^1.4.5-lts.1",
     "pusher-js": "^8.4.0-rc2",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@babel/core": "^7.12.16",
     "@babel/eslint-parser": "^7.12.16",
+    "@types/multer": "^1.4.12",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
     "@vue/cli-service": "~5.0.0",

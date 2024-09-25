@@ -576,4 +576,23 @@ export class TicketDetailsService {
       }
     });
   }
+  @Cron('* * * * *')
+  async delExpireOtpForTicketCancelation() {
+    const currentDate = new Date();
+    const startOfToday = new Date(currentDate.setHours(0, 0, 0, 0));
+    const endOfToday = new Date(currentDate.setHours(23, 59, 59, 999));
+    const result = await this.cancelTicketRequestRepo
+      .createQueryBuilder('ticketCancelOtp')
+      .softDelete()
+      .where('createdAt BETWEEN :startOfToday AND :endOfToday', {
+        startOfToday,
+        endOfToday,
+      })
+      .andWhere('EXTRACT(MINUTE FROM createdAt) <= :currentMinute - :minDiff', {
+        currentMinute: currentDate.getMinutes(),
+        minDiff: 1,
+      })
+      .execute();
+    console.log(result);
+  }
 }

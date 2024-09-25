@@ -184,5 +184,22 @@ async triggerAddPassengers({commit},payload){
   console.log(commit);
   const result = await busDetailServices.addPassengers(payload);
   return result;
+},
+
+async triggerGetLoggedInUserDetail(){
+  const result = await userService.getLoggedInUserDetail();
+  return result;
+},
+
+async triggerUpdateUserDetails({commit},payload){
+  console.log(commit);
+  const result = await userService.updateUserDetails(payload);
+  return result;
+},
+
+async triggerUploadUserImg({commit},payload){
+  console.log(commit);
+  const result = await userService.uploadUserImg(payload);
+  return result;
 }
 };

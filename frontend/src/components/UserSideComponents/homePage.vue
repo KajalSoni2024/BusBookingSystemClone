@@ -6,12 +6,12 @@
       style="border: 3px solid rgb(246, 126, 83)"
       :elevation="12"
     >
-      <v-select label="State" :items="states" v-model="selectedState" item-title="state_name" item-value="state_name"></v-select>
+      <v-select label="State" v-if="states.length>0" :items="states" v-model="selectedState" item-title="state_name" item-value="state_name"></v-select>
     
-      <v-select label="From" :items="cities" v-model="searchData.source" item-title="city_name" item-value="city_name"  @blur="v$.source.$touch"
+      <v-select label="From" v-if="cities.length>0"  :items="cities" v-model="searchData.source" item-title="city_name" item-value="city_name"  @blur="v$.source.$touch"
        :error-messages="v$.source.$errors.map((e)=>e.$message)"></v-select>
      
-       <v-select label="To" :items="cities" v-model="searchData.destination"  @blur="v$.source.$touch"
+       <v-select label="To" v-if="cities.length>0"  :items="cities" v-model="searchData.destination"  @blur="v$.source.$touch"
       :error-messages="v$.source.$errors.map((e)=>e.$message)" item-title="city_name" item-value="city_name"></v-select>
 
 <v-text-field 

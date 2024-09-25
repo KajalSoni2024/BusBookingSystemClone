@@ -44,5 +44,19 @@ async checkForgetPassOtp(payload){
 
  async getAllMessagesByChannel(){
   return await axiosGet('/messages/getAllMessagesByChannel')
+ },
+
+ async getLoggedInUserDetail(){
+  const result =  await axiosGet('/user/getLoggedInUserDetail');
+  return result.data;
+ },
+
+ async updateUserDetails(payload){
+  const result = await axiosPost('/user/updateUserDetails',payload);
+  return result;
+ },
+ async uploadUserImg(payload){
+  const result = await axiosPost('/user/uploadUserImg',payload);
+  return result;
  }
 }

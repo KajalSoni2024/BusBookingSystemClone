@@ -28,7 +28,7 @@
         ></v-text-field>
         <div class="d-flex flex-row justify-center align-center">
           <v-btn variant="outlined" color="green" @click="resetPassword">
-            >Send Otp</v-btn
+          Reset Password</v-btn
           >
         </div>
       </div>
@@ -42,12 +42,15 @@
         >mdi-close</v-icon
       >
     </div>
-      <v-text-field
-        label="Enter Otp"
-        v-model="forgetPassData.otp"
-        @keyup.enter="sendOtp"
-        color="deep-orange-darken-1"
-      ></v-text-field>
+    <div class='d-flex flex-column justify-center align-center ga-5'>
+    <p class="text-center">Enter Otp</p>
+      <v-otp-input
+      length="6"
+      v-model="forgetPassData.otp"
+      ></v-otp-input>
+      <p class="text-primary">Otp Will be Expired in 00:{{ timeLimit }}</p>
+     <div class="d-flex flex-row justify-center align-center"><v-btn @click="sendOtp" color="deep-orange-darken-1">Send</v-btn></div>
+    </div>
     </v-card>
   </v-dialog>
   <v-dialog v-model="isShowAlert" width="auto">
@@ -64,7 +67,7 @@
   </v-dialog>
 </template>
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 import { axiosPost } from "../../services/service";
@@ -74,6 +77,7 @@ const isShowPassword = ref(false);
 const isShowOtpModal = ref(false);
 const isShowAlert = ref(false);
 const alertMsg = ref(false);
+const timeLimit = ref(60);
 const forgetPassData = reactive({
   email: null,
   password: null,
@@ -107,6 +111,19 @@ const resetPassword = async () => {
   }
 };
 
+watch(isShowOtpModal,()=>{
+if(isShowOtpModal.value){
+  timeLimit.value=60;
+  setInterval(()=>{
+    if(timeLimit.value>0){
+      timeLimit.value--;
+    }
+  },1000);
+  if(timeLimit.value==0){
+    isShowOtpModal.value=false;
+  }
+}
+})
 const sendOtp = async () => {
   const result = await store.dispatch("triggerCheckForgetPassOtp", {
     userId: userId.value,

@@ -1,14 +1,14 @@
 <template>
   <div v-if="listOfChannels?.length==0"><p class="text-center text-h4 text-green">No Querys From any user</p></div>
   <div v-else class="d-flex flex-column justify-center align-center">
-        <div class="border-thin rounded-lg pa-3 ma-5" style="width:800px" @click="openChat(channel.user1.userId, channel.user2.userId)" v-for="channel in listOfChannels" :key="channel.channelId" >
+        <div class="border-thin rounded-lg pa-3 ma-5" style="width:800px" @click="openChat(channel.user1.userId, channel.user2.userId)" v-for="channel in listOfChannels" :key="channel?.channelId" >
         <div class="d-flex flex-row ga-2">
           <v-icon color="grey">mdi-account-circle</v-icon>
-          <p class="text-sm">{{ channel.user2.firstName }} {{ channel.user2.lastName }}</p>
+          <p class="text-sm">{{ channel?.user2?.firstName }} {{ channel?.user2?.lastName }}</p>
         </div>
         <div class="mt-2"> 
-          <p style="padding-left: 30px;">{{channel.messages[0].message}}</p>
-          <p class="float-right">{{ getLocalDateTime(channel.messages[0].createdAt)}}</p>
+          <p style="padding-left: 30px;">{{channel?.messages[0]?.message}}</p>
+          <p class="float-right">{{ getLocalDateTime(channel?.messages[0]?.createdAt)}}</p>
         </div>
         </div>
 

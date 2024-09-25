@@ -28,6 +28,8 @@ import { Message } from './messages/entities/message.entity';
 import { CommonModule } from './common/common.module';
 import { Channels } from './messages/entities/channel.entity';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -56,6 +58,10 @@ import { ScheduleModule } from '@nestjs/schedule';
         Channels,
       ],
       synchronize: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads/',
     }),
     ScheduleModule.forRoot(),
     UsersModule,

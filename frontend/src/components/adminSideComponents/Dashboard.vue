@@ -142,11 +142,11 @@
       </thead>
       <tbody>
         <tr v-for="user in recentlyRegisteredUser" :key="user.userId">
-          <td>{{ user.firstName }} {{ user.lastName }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.gender }}</td>
-          <td>{{ user.contact }}</td>
-          <td>{{ getLocalDataTime(user.createdAt) }}</td>
+          <td>{{ user?.firstName }} {{ user?.lastName }}</td>
+          <td>{{ user?.email }}</td>
+          <td>{{ user?.gender }}</td>
+          <td>{{ user?.contact }}</td>
+          <td>{{ getLocalDataTime(user?.createdAt) }}</td>
         </tr>
       </tbody>
     </v-table>
