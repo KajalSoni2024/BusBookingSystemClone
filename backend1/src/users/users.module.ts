@@ -9,6 +9,7 @@ import { EmailerModule } from 'src/emailer/emailer.module';
 import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
 import { MessagesModule } from 'src/messages/messages.module';
 import { CommonModule } from 'src/common/common.module';
+import { ConductorAttendance } from './entities/Attendance.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([
@@ -16,6 +17,7 @@ import { CommonModule } from 'src/common/common.module';
       TicketDetail,
       ForgetPassRequest,
       TicketRefund,
+      ConductorAttendance,
     ]),
     EmailerModule,
     MessagesModule,

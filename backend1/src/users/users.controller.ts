@@ -147,4 +147,44 @@ export class UserController {
     const user = req.user;
     return await this.userService.uploadUserImg(user, file);
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/getConductorDetails')
+  async getConductorDetails(@Request() req: any) {
+    const user = req.user;
+    const { userId } = user;
+    return await this.userService.getConductorDetails(userId);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get('/getTotalWorkingDaysPerMonth')
+  async getTotalWorkingDaysPerMonth(@Request() req: any) {
+    const user = req.user;
+    return await this.userService.getTotalWorkingDaysPerMonth(3);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get('/getTotalAbsentDaysPerMonth')
+  async getTotalAbsentDaysPerMonth(@Request() req: any) {
+    const user = req.user;
+    return await this.userService.getTotalAbsentDaysPerMonth(3);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get('/getProductivityRatioPerMonth')
+  async getProductivityRatioPerMonth(@Request() req: any) {
+    return await this.userService.getProductivityRatioPerMonth(3);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Post('/markAsPresent')
+  async markAsPresent(@Request() req: any) {
+    return await this.userService.markAsPresent(3);
+  }
+
+  // @UseGuards(JwtAuthGuard)
+  @Get('/checkIsTodaysAttendanceMarked')
+  async checkIsTodaysAttendanceMarked(@Request() req: any) {
+    return await this.userService.checkIsTodaysAttendanceMarked(3);
+  }
 }

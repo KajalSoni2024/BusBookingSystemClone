@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateBusDetailDto } from './dto/create-bus-detail.dto';
 import { UpdateBusDetailDto } from './dto/update-bus-detail.dto';
 import { BusDetail } from './entities/bus-detail.entity';
-import { Repository, IsNull, Not } from 'typeorm';
+import { Repository, IsNull, Not, LessThan } from 'typeorm';
 import { BusSeats } from './entities/bus-seats.entity';
 import { ConductorDetail } from 'src/conductor-details/entities/conductor-detail.entity';
 import { BusRoute } from 'src/bus-routes/entities/bus-route.entity';
@@ -24,6 +24,11 @@ export class BusDetailsService {
     private pusherService: PusherService,
   ) {}
   async create(createBusDetailDto: any) {
+    let days: string = '';
+    createBusDetailDto.workingDays.forEach((day: any) => {
+      days = day + ',';
+    });
+    createBusDetailDto.workingDays = days.slice(0, days.length - 1);
     try {
       const busDetail = await this.busDetailRepo.save({
         availableSeats: createBusDetailDto.totalSeats,

@@ -30,7 +30,7 @@ import { Channels } from './messages/entities/channel.entity';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
-
+import { ConductorAttendance } from './users/entities/Attendance.entity';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -56,6 +56,7 @@ import { join } from 'path';
         TicketRefund,
         Message,
         Channels,
+        ConductorAttendance,
       ],
       synchronize: true,
     }),

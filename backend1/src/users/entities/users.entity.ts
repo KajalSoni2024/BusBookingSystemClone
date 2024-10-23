@@ -15,7 +15,7 @@ import {
 import { TicketRefund } from 'src/payments/entities/ticketRefund.entity';
 import { Message } from 'src/messages/entities/message.entity';
 import { Channels } from 'src/messages/entities/channel.entity';
-
+import { ConductorAttendance } from './Attendance.entity';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -89,4 +89,7 @@ export class User {
 
   @OneToOne(() => Channels, (channel) => channel.user2)
   userChannel: Channels;
+
+  @OneToMany(() => ConductorAttendance, (attendance) => attendance.user)
+  attendance: ConductorAttendance[];
 }

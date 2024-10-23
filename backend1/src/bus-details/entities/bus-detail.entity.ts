@@ -14,6 +14,7 @@ import { BusRoute } from '../../bus-routes/entities/bus-route.entity';
 import { TicketDetail } from 'src/ticket-details/entities/ticket-detail.entity';
 import { BusSeats } from './bus-seats.entity';
 import { User } from '../../users/entities/users.entity';
+import { ConductorAttendance } from 'src/users/entities/Attendance.entity';
 @Entity()
 export class BusDetail {
   @PrimaryGeneratedColumn()
@@ -36,6 +37,9 @@ export class BusDetail {
 
   @Column()
   state: string;
+
+  @Column()
+  workingDays: string;
 
   @OneToOne(
     () => User,
@@ -61,6 +65,10 @@ export class BusDetail {
 
   @OneToMany(() => BusSeats, (busSeats) => busSeats.busDetail)
   seatList: BusSeats[];
+
+  @OneToMany(() => ConductorAttendance, (attendance) => attendance.busDetail)
+  conductorAttendance: ConductorAttendance[];
+
   @CreateDateColumn({ type: 'timestamp' })
   createdAt: Date;
 

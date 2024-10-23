@@ -9,6 +9,7 @@ import { ForgetPassRequest } from './entities/forget-pass-req.entity';
 import { PusherService } from 'src/common/services/pusher.service';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
+import { ConductorAttendance } from './entities/Attendance.entity';
 @Injectable()
 export class UsersService {
   constructor(
@@ -18,6 +19,8 @@ export class UsersService {
     private ticketDetailRepo: Repository<TicketDetail>,
     @InjectRepository(ForgetPassRequest)
     private forgetPassRequestRepo: Repository<ForgetPassRequest>,
+    @InjectRepository(ConductorAttendance)
+    private conductorAttendanceRepo: Repository<ConductorAttendance>,
     private pusherService: PusherService,
   ) {}
 
@@ -454,6 +457,18 @@ export class UsersService {
     }
   }
 
+  async getConductorDetails(userId: any) {
+    const result = await this.usersRepository.findOne({
+      where: { userId: userId },
+      relations: {
+        busAssignedToConductor: true,
+        busAssignedToDriver: true,
+        attendance: true,
+      },
+    });
+    return result;
+  }
+
   @Cron('* * * * *')
   async delExpiredOtpsForForgetPass() {
     const currentDate = new Date();
@@ -474,5 +489,221 @@ export class UsersService {
       .printSql()
       .execute();
     console.log(result);
+  }
+
+  async markAsPresent(userId: any) {
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+    const result = await this.conductorAttendanceRepo
+      .createQueryBuilder('attendance')
+      .update(ConductorAttendance)
+      .set({ isPresent: true })
+      .where('userId=:userId AND attendanceDate=:currentDate', {
+        userId,
+        currentDate,
+      })
+      .execute();
+    console.log(result);
+    return result;
+  }
+
+  async checkIsTodaysAttendanceMarked(userId: any) {
+    const currentDate = new Date();
+    console.log(currentDate);
+    currentDate.setHours(0, 0, 0, 0);
+    console.log(currentDate);
+    try {
+      const result = await this.conductorAttendanceRepo
+        .createQueryBuilder('attendance')
+        .where('userId=:userId', {
+          userId: userId,
+        })
+        .andWhere('attendanceDate=:currentDate', { currentDate: currentDate })
+        .andWhere('isPresent=:isPresent', { isPresent: true })
+        .getOne();
+      return result ? true : false;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  @Cron('0 0 1 * *')
+  async createAttendanceChartPerMonth() {
+    const users = await this.usersRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.busAssignedToConductor', 'conductorBusDetail')
+      .leftJoinAndSelect('user.busAssignedToDriver', 'driverBusDetail')
+      .where('user.role in (:...roles)', { roles: [3, 2] })
+      .andWhere('user.isAssigned=:isAssigned', { isAssigned: true })
+      .getMany();
+    console.log(users);
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const datesOfMonth = [];
+    if (
+      currentMonth == 0 ||
+      currentMonth == 2 ||
+      currentMonth == 4 ||
+      currentMonth == 6 ||
+      currentMonth == 7 ||
+      currentMonth == 9 ||
+      currentMonth == 10
+    ) {
+      let currentDay = currentDate.getDay();
+      for (let i = 0; i < 31; i++) {
+        const date = `${currentDate.getFullYear()}-${currentDate.getMonth() < 9 ? '0' + (currentDate.getMonth() + 1) : currentDate.getMonth() + 1}-${i < 9 ? '0' + (i + 1) : i + 1}`;
+        if (currentDay < 7) {
+          datesOfMonth.push({ date: date, day: currentDay });
+          currentDay++;
+        } else {
+          currentDay = 0;
+          datesOfMonth.push({ date: date, day: currentDay });
+        }
+      }
+    } else {
+      let currentDay = currentDate.getDay();
+      for (let i = 0; i < 30; i++) {
+        const date = `${currentDate.getFullYear()}-${currentDate.getMonth() < 9 ? '0' + (currentDate.getMonth() + 1) : currentDate.getMonth() + 1}-${i < 9 ? '0' + (i + 1) : i + 1}`;
+        if (currentDay < 7) {
+          datesOfMonth.push({ date: date, day: currentDay });
+          currentDay++;
+        } else {
+          currentDay = 0;
+          datesOfMonth.push({ date: date, day: currentDay });
+          currentDay++;
+        }
+      }
+    }
+
+    users.forEach((user) => {
+      const userId: any = user.userId;
+
+      if (user.busAssignedToConductor != null) {
+        const busId: any = user.busAssignedToConductor.busId;
+        const workingDays = user.busAssignedToConductor?.workingDays
+          .split(',')
+          .map((day) => {
+            return parseInt(day);
+          });
+        console.log(workingDays);
+        datesOfMonth.forEach(async (date) => {
+          if (workingDays.includes(date.day)) {
+            const result = await this.conductorAttendanceRepo
+              .createQueryBuilder()
+              .insert()
+              .into(ConductorAttendance)
+              .values({
+                attendanceDate: date.date,
+                user: userId,
+                busDetail: busId,
+              })
+              .execute();
+            console.log(result);
+          }
+        });
+      }
+      if (user.busAssignedToDriver != null) {
+        const busId: any = user.busAssignedToDriver.busId;
+        const workingDays = user.busAssignedToDriver?.workingDays
+          .split(',')
+          .map((day) => {
+            return parseInt(day);
+          });
+        console.log('workingDays ', workingDays);
+        datesOfMonth.forEach(async (date) => {
+          if (workingDays.includes(date.day)) {
+            const result = await this.conductorAttendanceRepo
+              .createQueryBuilder()
+              .insert()
+              .into(ConductorAttendance)
+              .values({
+                attendanceDate: date.date,
+                user: userId,
+                busDetail: busId,
+              })
+              .execute();
+            console.log(result);
+          }
+        });
+      }
+    });
+  }
+
+  async getTotalWorkingDaysPerMonth(userId: any) {
+    const currentTimestamp = new Date();
+    try {
+      const result = await this.conductorAttendanceRepo
+        .createQueryBuilder('attendance')
+        .where('EXTRACT(YEAR FROM attendanceDate)=:currentYear', {
+          currentYear: currentTimestamp.getFullYear(),
+        })
+        .andWhere('EXTRACT(MONTH FROM attendanceDate)=:currentMonth', {
+          currentMonth: currentTimestamp.getMonth() + 1,
+        })
+        .andWhere('userId = :userId', { userId })
+        .andWhere('isPresent= :isPresent', { isPresent: true })
+        .getOne();
+      console.log('present ' + result);
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async getTotalAbsentDaysPerMonth(userId: any) {
+    const currentTimestamp = new Date();
+    try {
+      const result = await this.conductorAttendanceRepo
+        .createQueryBuilder('attendance')
+        .where(
+          'EXTRACT(YEAR FROM attendanceDate)=:currentYear AND EXTRACT(MONTH FROM attendanceDate)=:currentMonth',
+          {
+            currentYear: currentTimestamp.getFullYear(),
+            currentMonth: currentTimestamp.getMonth() + 1,
+          },
+        )
+        .andWhere('userId = :userId', { userId })
+        .andWhere('isPresent= :isPresent', { isPresent: false })
+        .getCount();
+      console.log('absent ' + result);
+      return result;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+  async getProductivityRatioPerMonth(userId: any) {
+    const currentTimestamp = new Date();
+    try {
+      const totalDaysPresent = await this.conductorAttendanceRepo
+        .createQueryBuilder('attendance')
+        .where(
+          'EXTRACT(YEAR FROM attendanceDate)=:currentYear AND EXTRACT(MONTH FROM attendanceDate)=:currentMonth',
+          {
+            currentYear: currentTimestamp.getFullYear(),
+            currentMonth: currentTimestamp.getMonth() + 1,
+          },
+        )
+        .andWhere('userId = :userId', { userId })
+        .andWhere('isPresent= :isPresent', { isPresent: true })
+        .getCount();
+
+      const totalDays = await this.conductorAttendanceRepo
+        .createQueryBuilder('attendance')
+        .where(
+          'EXTRACT(YEAR FROM attendanceDate)=:currentYear AND EXTRACT(MONTH FROM attendanceDate)=:currentMonth',
+          {
+            currentYear: currentTimestamp.getFullYear(),
+            currentMonth: currentTimestamp.getMonth() + 1,
+          },
+        )
+        .andWhere('userId = :userId', { userId })
+        .getCount();
+
+      const ratio = (totalDaysPresent / totalDays).toFixed(2);
+      console.log('totalDaysPresent ' + totalDaysPresent);
+      console.log('totalDays' + totalDays);
+      console.log('ratio =>' + ratio);
+      return ratio;
+    } catch (err) {
+      console.log(err);
+    }
   }
 }
